@@ -10,17 +10,8 @@ import Frame from 'react-frame-component';
 enum PageState {
 	LANDING = "LANDING",
 	MUTLISELECT = "MULTISELECT",
-	ARTICLE = "ARTICLE",
 	SAVE_PROCESS = "SAVE_PROCESS",
 	SAVE_SUCCESS = "SAVE_SUCCESS"
-}
-
-function Head() {
-	return (
-		<>
-			<link rel="stylesheet" type='text/css' href={chrome.runtime.getURL('app.css')} />		
-		</>
-	);
 }
 
 function App() {
@@ -31,50 +22,35 @@ function App() {
 		setPageState(PageState.MUTLISELECT);
 	}
 
-	const handleArticleClick = () => {
-		setPageState(PageState.ARTICLE);
-	}
-
-	useEffect(()=> {
-		const el = (document.getElementById("krisinote-clipper-iframe") as HTMLIFrameElement).contentDocument?.getElementById("krisinote-pages-container");
-		if(el){
-			const heightOfBody = window.getComputedStyle((document.getElementById("krisinote-clipper-iframe") as HTMLIFrameElement).contentDocument?.getElementById("krisinote-pages-container") as HTMLElement).height;
-			(document.getElementById("krisinote-clipper-iframe") as HTMLElement).style.height = heightOfBody;
-		}
-	},[pageState])
+	// useEffect(()=> {
+	// 	const el = (document.getElementById("krisinote-clipper-iframe") as HTMLIFrameElement).contentDocument?.getElementById("krisinote-pages-container");
+	// 	if(el){
+	// 		const heightOfBody = window.getComputedStyle((document.getElementById("krisinote-clipper-iframe") as HTMLIFrameElement).contentDocument?.getElementById("krisinote-pages-container") as HTMLElement).height;
+	// 		(document.getElementById("krisinote-clipper-iframe") as HTMLElement).style.height = heightOfBody;
+	// 	}
+	// },[pageState])
 
 	return (
 		<>
 			<Frame
 				id='krisinote-clipper-iframe'
 				style={{
-					// pointerEvents: 'none',
+					height: "400px",
 				}}
-				
-				head={<Head/>}
+				initialContent="<!DOCTYPE html><html><head></head><body style='margin: 0;'><div></div></body></html>"
 			>
 				<style>
 					
 				</style>
-				<div
-					style={{
-						display: "flex",
-						flexDirection: "column",
-					}}
-				>
 
-					<div
-						style={{
-							pointerEvents: 'auto',
-							height: "auto"
-						}}
-						id='krisinote-pages-container'
-						>
+				<div
+					id='krisinote-pages-container'
+				>
 
 					{
 						pageState === PageState.LANDING ? 
 						<LandingPage 
-						onMultiSelectClick={handleMultiselectClick}
+							onMultiSelectClick={handleMultiselectClick}
 						/> : null
 					}
 					{
@@ -84,20 +60,11 @@ function App() {
 						pageState === PageState.SAVE_PROCESS ? <SaveProcessPage /> : null
 					}
 					{
-						pageState === PageState.SAVE_SUCCESS? <SaveSuccessPage /> : null
+						pageState === PageState.SAVE_SUCCESS ? <SaveSuccessPage /> : null
 					}
-					</div>
-					<div
-						style={{
-							flex: "1",
-							pointerEvents: "none"
-						}}
-					>
-
-					</div>
 				</div>
 
-				</Frame>		
+			</Frame>		
 		</>
 	);
 }
