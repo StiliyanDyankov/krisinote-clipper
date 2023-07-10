@@ -1,19 +1,48 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
 import App from './App';
-import reportWebVitals from './reportWebVitals';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+let root: any = null
+const rootElement = document.createElement("div");
+rootElement.style.position = "fixed";
+rootElement.style.right = "12px";
+rootElement.style.top = "12px";
+rootElement.style.width = "300px";
+rootElement.style.height = "auto";
+rootElement.style.zIndex = "99999";
+// rootElement.style.backgroundColor = "#ffffff";
+// rootElement.style.pointerEvents = "none";
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+rootElement.id = "react-chrome-app";
+
+document.body.appendChild(rootElement);
+
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+
+	if(!root || !(root._internalRoot)) {
+		root = ReactDOM.createRoot(
+			rootElement
+		);
+	}
+
+	if (request.type === 'executeContentScript') {
+		console.log("run root",root);
+		root.render(
+			<React.StrictMode>
+				<App />
+			</React.StrictMode>
+		);    
+
+	} else if (request.type === "stopContentScript") {
+		// remove the service element from DOM
+
+		console.log("stop root",root);
+
+		// console.log("runs the root unmount command");
+
+		// const clipperDOMEl = document.getElementById("react-chrome-app");
+
+		// document.body.removeChild(clipperDOMEl as Node);
+		root.unmount();
+	}
+});
