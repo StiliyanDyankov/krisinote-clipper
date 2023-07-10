@@ -10,6 +10,7 @@ import Frame from 'react-frame-component';
 enum PageState {
 	LANDING = "LANDING",
 	MUTLISELECT = "MULTISELECT",
+	ARTICLE = "ARTICLE",
 	SAVE_PROCESS = "SAVE_PROCESS",
 	SAVE_SUCCESS = "SAVE_SUCCESS"
 }
@@ -28,6 +29,10 @@ function App() {
 	
 	const handleMultiselectClick = () => {
 		setPageState(PageState.MUTLISELECT);
+	}
+
+	const handleArticleClick = () => {
+		setPageState(PageState.ARTICLE);
 	}
 
 	useEffect(()=> {

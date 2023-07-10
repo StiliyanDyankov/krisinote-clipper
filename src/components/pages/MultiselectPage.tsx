@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { HtmlHTMLAttributes, useEffect, useRef, useState } from "react";
 
 const unviableElements = ["SPAN", "A", "I", "IFRAME", "B", "SVG", "PATH"]
 
@@ -78,55 +78,106 @@ const removeHoverWrapper = (selectionContainer: HTMLElement): void => {
     }
 }
 
+const findAndAnnihilateChildren = (
+    selectedElements: Map<number, HTMLElement>,
+    selectedElementsDepth: Map<number, number>,
+    possibleParent: {element: HTMLElement, depth: number}
+): Map<number, HTMLElement> => {
+        selectedElementsDepth.forEach((value, key)=> {
+            if(possibleParent.depth < value) {
+                if(isNthParent(possibleParent.element, selectedElements.get(key) as HTMLElement, value - possibleParent.depth)) {
+                    annihilateChild(key);
+                    selectedElements.delete(key);
+                    selectedElementsDepth.delete(key);
+                }
+            }
+        });
+        return selectedElements;
+}
+
+const annihilateChild = (
+    keyOfChild: number
+): void => {
+    const childWrapper = document.getElementById(`krisinote-clipper-selection-wrapper-${keyOfChild}`);
+    const selectionContainer = document.getElementById("krisinote-clipper-selection-container");
+    
+    (selectionContainer as HTMLElement).removeChild(childWrapper as Node);
+}
+
+const isNthParent = (possibleParent: HTMLElement, childElement: HTMLElement, deltaDepth: number) => {
+    let childPlaceholder = childElement;
+    for(let i = 0; i < deltaDepth; i++) {
+        childPlaceholder = childPlaceholder.parentElement as HTMLElement;
+    }
+    return childPlaceholder === possibleParent;
+}
+
+const getElementDepth = (element: HTMLElement, counter: number = 0): number => {
+    if(element.nodeName === "BODY") return counter;
+    else return getElementDepth(element.parentElement as HTMLElement, counter+1); 
+}
+
 const MultiselectPage = () => {
 
-    const [selectionContainer, setSelectionContainer] = useState<HTMLElement>(createSelectionContainer);
+    const [selectionContainer, setSelectionContainer] = useState<HTMLElement | null>(createSelectionContainer);
 
     // stores outlined elements in state
     const [selectedElements, setSelectedElements] = useState<Map<number, HTMLElement>>(new Map());
 
-    const [counterAutoIncr, setCounterAutoIncr] = useState<number>(1);
+    const [selectedElementsDepth, setSelectedElementsDepth] = useState<Map<number, number>>(new Map());
+
+    let counterAutoIncr = useRef(1);
 
     const handleMouseOverEvent = (event: MouseEvent): void => {
-        let hoveredElement = event.target as HTMLElement;
-
-        if(!hoveredElement.id.startsWith("krisinote-clipper-selection-wrapper")) {
+        let hoveredElement = event.target as HTMLElement;                                                                                
+        if(
+            !hoveredElement.id.startsWith("krisinote-clipper-selection-wrapper")
+            // last two checks for ignoring pop-up selection
+            && !(hoveredElement.id.startsWith("react-chrome-app")) 
+            && !(hoveredElement.nodeName === "IFRAME")
+        ) {
             let outlinedElement: HTMLElement = getViableOutlinedElement(hoveredElement);
             
-            createNewWrapper(outlinedElement, selectionContainer, WrapperTypes.hover);
+            createNewWrapper(outlinedElement, selectionContainer as HTMLElement, WrapperTypes.hover);
         }
     }
 
     const handleMouseOutEvent = (event: MouseEvent): void => {
-        removeHoverWrapper(selectionContainer);
+        removeHoverWrapper(selectionContainer as HTMLElement);
     }
 
 
     const handleClickEvent = (event: MouseEvent) : void => {
         let outlinedElement: HTMLElement = getViableOutlinedElement(event.target as HTMLElement);
         
-        // check if decendants of this elements are in state and handle
+        if(outlinedElement.id.startsWith("react-chrome-app") && outlinedElement.nodeName === "IFRAME") {
+            //
+            // empty - no behaviour if selected element is the clipper itself
+            //
+        } else if(outlinedElement.id.startsWith("krisinote-clipper-selection-wrapper")) {
+            // executes on second time selection of an element - removes the selected el
 
-        if(outlinedElement.id.startsWith("krisinote-clipper-selection-wrapper")) {
-            const keyOfSavedElement = parseInt(outlinedElement.id.split("-")[5]);
-            setSelectedElements(prevState => {
-                prevState.delete(keyOfSavedElement);
-                return new Map(prevState);
-            })
-            // fix bug here
+            const keyOfSavedElement = parseInt(outlinedElement.id.split("-")[4]);
+            selectedElements.delete(keyOfSavedElement);
+            selectedElementsDepth.delete(keyOfSavedElement);
+            setSelectedElements(selectedElements);
+            setSelectedElementsDepth(selectedElementsDepth);
             document.getElementById("krisinote-clipper-selection-container")?.removeChild(outlinedElement);
         } else {
-
+            // executed on initial selection of an element
+            findAndAnnihilateChildren(
+                selectedElements, 
+                selectedElementsDepth, 
+                { element: outlinedElement, depth: getElementDepth(outlinedElement) }
+            );
             
-            setSelectedElements(new Map(selectedElements.set(counterAutoIncr, outlinedElement)));
-            createNewWrapper(outlinedElement, selectionContainer, WrapperTypes.selection, counterAutoIncr);
-            setCounterAutoIncr(c => c+1);
+            // this logic should remain the same whether selected is parent or not
+            setSelectedElements(new Map(selectedElements.set(counterAutoIncr.current, outlinedElement)));
+            setSelectedElementsDepth(new Map(selectedElementsDepth.set(counterAutoIncr.current, getElementDepth(outlinedElement))));
+            createNewWrapper(outlinedElement, selectionContainer as HTMLElement, WrapperTypes.selection, counterAutoIncr.current);
+
+            counterAutoIncr.current = counterAutoIncr.current + 1;
         }
-
-
-
-        
-        
     }
 
     useEffect(()=> {
@@ -142,13 +193,13 @@ const MultiselectPage = () => {
             removeSelectionContainer();
         }
 
-    },[])
+    },[]);
 
     return ( 
         <>
             <h1>hello MultiselectPage</h1>
             <p>some paragraph content</p>
-            <div>some block content</div>
+            <div>some block content {selectedElements.size}</div>
             <button
                 onClick={()=> {
                     console.log(window.getComputedStyle((document.getElementById("krisinote-clipper-iframe") as HTMLIFrameElement).contentDocument?.getElementById("krisinote-pages-container") as HTMLElement).height)

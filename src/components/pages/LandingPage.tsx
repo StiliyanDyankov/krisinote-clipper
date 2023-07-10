@@ -13,6 +13,7 @@ const LandingPage = ({
             <button onClick={()=> {
                 onMultiSelectClick();
             }}>Multiselect</button>
+            {/* <button onClick={}>article select</button> */}
             
         </>
     );
