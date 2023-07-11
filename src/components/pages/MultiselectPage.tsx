@@ -3,7 +3,12 @@ import { WrapperTypes, createNewWrapper, createSelectionContainer, findAndAnnihi
 
 const MultiselectPage = () => {
 
-    const [selectionContainer, setSelectionContainer] = useState<HTMLElement | null>(createSelectionContainer);
+    const [selectionContainer, setSelectionContainer] = useState<HTMLElement | null>(()=> {
+        if(document.getElementById("krisinote-clipper-selection-container")) {
+           document.body.removeChild(document.getElementById("krisinote-clipper-selection-container") as Node);
+        }
+        return createSelectionContainer();
+    });
 
     // stores outlined elements in state
     const [selectedElements, setSelectedElements] = useState<Map<number, HTMLElement>>(new Map());
