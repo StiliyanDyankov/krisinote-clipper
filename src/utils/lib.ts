@@ -34,6 +34,7 @@ export const createSelectionContainer = (): HTMLElement => {
     const selectionContainer = document.createElement("div");
     selectionContainer.id = "krisinote-clipper-selection-container";
     document.body.appendChild(selectionContainer);
+    console.log("runs createCont from lib");
     return selectionContainer;
 }
 

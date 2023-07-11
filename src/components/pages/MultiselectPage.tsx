@@ -7,6 +7,7 @@ const MultiselectPage = () => {
         if(document.getElementById("krisinote-clipper-selection-container")) {
            document.body.removeChild(document.getElementById("krisinote-clipper-selection-container") as Node);
         }
+        console.log("runs creation of cont");
         return createSelectionContainer();
     });
 
@@ -70,9 +71,12 @@ const MultiselectPage = () => {
     }
 
     useEffect(()=> {
-        document.addEventListener('mouseover', handleMouseOverEvent);
-        document.addEventListener("mouseout", handleMouseOutEvent);
-        document.addEventListener("click", handleClickEvent)
+        if(selectionContainer) {
+            console.log("runs attaching of events");
+            document.addEventListener('mouseover', handleMouseOverEvent);
+            document.addEventListener("mouseout", handleMouseOutEvent);
+            document.addEventListener("click", handleClickEvent)
+        }
 
         return () => {
             // clean-up

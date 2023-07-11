@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { WrapperTypes, createNewWrapper, createSelectionContainer, isElementViable } from "../../utils/lib";
+import { WrapperTypes, createNewWrapper, createSelectionContainer, isElementViable, removeSelectionContainer } from "../../utils/lib";
 
 enum SelectType {
     ARTICLE = "ARTICLE",
@@ -96,8 +96,6 @@ const putButtons = (id:number): void => {
     topElement.appendChild(minusButton);
     
     selectionWrapper.appendChild(topElement);
-
-    
 }
 
 const createNewSpecialWrapper = (outlinedElement: HTMLElement, selectionContainer: HTMLElement, id: number, eventHandlers: {
@@ -145,6 +143,7 @@ const LandingPage = ({
 
     const handlePlusButtonClick = () => {
         const currentSelectedEl = selectedElements.get(currentSelectedElementKey.current);
+        // check if a parent element has been traced before
         if(selectedElements.has(currentSelectedElementKey.current + 1)){
             currentSelectedElementKey.current++;
             createNewSpecialWrapper(
@@ -168,6 +167,7 @@ const LandingPage = ({
 
     const handleMinusButtonClick = () => {
         const currentSelectedEl = selectedElements.get(currentSelectedElementKey.current);
+        // check if a child element has been traced before
         if(selectedElements.has(currentSelectedElementKey.current - 1)){
             currentSelectedElementKey.current--;
             createNewSpecialWrapper(
@@ -203,6 +203,11 @@ const LandingPage = ({
         return () => {
             document.getElementById("krisinote-clipper-article-plus-button")?.removeEventListener("click", handlePlusButtonClick);
             document.getElementById("krisinote-clipper-article-minus-button")?.removeEventListener("click", handleMinusButtonClick);
+            if(document.getElementById("krisinote-clipper-selection-container") && document.getElementById("krisinote-clipper-selection-container")?.children.length){
+
+                removeSelectionContainer();
+            }
+            console.log("runs deletion of container");
         }
     }, []);
 
