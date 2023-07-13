@@ -14,6 +14,7 @@
     "@types/node": "^16.18.38",
     "@types/react": "^18.2.14",
     "@types/react-dom": "^18.2.6",
+    "computed-style-to-inline-style": "^3.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-frame-component": "^5.2.6",

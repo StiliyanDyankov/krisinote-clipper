@@ -1,5 +1,41 @@
 import { HtmlHTMLAttributes, useEffect, useRef, useState } from "react";
-import { WrapperTypes, createNewWrapper, createSelectionContainer, findAndAnnihilateChildren, getElementDepth, getViableOutlinedElement, removeHoverWrapper, removeSelectionContainer } from "../../utils/lib";
+import { WrapperTypes, createNewWrapper, createSelectionContainer, findAndAnnihilateChildren, getElementDepth, getViableOutlinedElement, krisinoteDOMParser, removeHoverWrapper, removeSelectionContainer } from "../../utils/lib";
+
+const testCSSParse = (el: HTMLElement) => {
+    console.log(el);
+    // const clone = el.cloneNode(true) as HTMLElement;
+    // // clone.style.color = "red";
+    // // clone.style.border = "1px solid yellow";
+    // // el.parentElement?.appendChild(clone as Node);
+    // console.log(window.getComputedStyle(clone).gridTemplateColumns);
+    // console.log(clone);
+    console.log(krisinoteDOMParser(el));
+    const cloned = krisinoteDOMParser(el);
+
+    const prase = new DOMParser();
+    const xml = new XMLSerializer();
+
+    const newCLone = prase.parseFromString(xml.serializeToString(cloned), "text/html");
+
+    
+
+    // just for testing purposes
+    const testBox = document.createElement("embed");
+    testBox.style.position = "fixed";
+    testBox.style.left = "12px";
+    testBox.style.top = "12px";
+    testBox.style.padding = "5px";
+    testBox.style.width = "700px";
+    testBox.style.height = "900px";
+    testBox.style.overflowY = "scroll";
+    testBox.style.zIndex = "99999";
+    testBox.style.backgroundColor = "#ffffff";
+    document.body.appendChild(testBox);
+    testBox.appendChild(newCLone);
+}
+
+
+
 
 const MultiselectPage = () => {
 
@@ -98,6 +134,11 @@ const MultiselectPage = () => {
                     console.log(window.getComputedStyle((document.getElementById("krisinote-clipper-iframe") as HTMLIFrameElement).contentDocument?.getElementById("krisinote-pages-container") as HTMLElement).height)
                 }}
             >some button</button>
+            <button
+            onClick={()=> {
+                testCSSParse(selectedElements.get(counterAutoIncr.current-1) as HTMLElement);
+            }}
+            >get stile</button>
         </> 
     );
 }

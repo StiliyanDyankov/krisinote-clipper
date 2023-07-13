@@ -1,13 +1,39 @@
 import { useEffect, useRef, useState } from "react";
-import { WrapperTypes, createNewWrapper, createSelectionContainer, isElementViable, removeSelectionContainer } from "../../utils/lib";
+import { WrapperTypes, createNewWrapper, createSelectionContainer, isElementViable, krisinoteDOMParser, removeSelectionContainer } from "../../utils/lib";
 
+
+const testCSSParse = (el: HTMLElement) => {
+    const cloned = krisinoteDOMParser(el);
+
+
+    // just for testing purposes
+    const testBox = document.createElement("div");
+    testBox.style.position = "fixed";
+    testBox.style.left = "12px";
+    testBox.style.top = "12px";
+    testBox.style.padding = "5px";
+    testBox.style.width = "1200px";
+    testBox.style.height = "900px";
+    testBox.style.overflowY = "scroll";
+    testBox.style.overflowX = "scroll";
+    testBox.style.zIndex = "99999";
+    testBox.style.backgroundColor = "#ffffff";
+    document.body.appendChild(testBox);
+    testBox.appendChild(cloned);
+
+}
 enum SelectType {
     ARTICLE = "ARTICLE",
     SIMPLIFIED_ARTICLE = "SIMPLIFIED_ARTICLE"
 }
 
 const getArticleSelectionEl = (): HTMLElement => {
-    let docToBeReturned = document.querySelector("article");
+    let docToBeReturned = document.querySelector("main article") as HTMLElement| null;
+    console.log("doc to be returned", docToBeReturned);
+    if(!docToBeReturned) {
+
+        docToBeReturned = document.querySelector("article") as HTMLElement | null;
+    }
     if(!docToBeReturned) {
         docToBeReturned = document.querySelector("body") as HTMLElement;
     }
@@ -199,6 +225,8 @@ const LandingPage = ({
             document.getElementById("krisinote-clipper-article-plus-button")?.addEventListener("click", handlePlusButtonClick);
             document.getElementById("krisinote-clipper-article-minus-button")?.addEventListener("click", handleMinusButtonClick);
 
+            console.log(selectedElements.get(currentSelectedElementKey.current));
+
         }
         return () => {
             document.getElementById("krisinote-clipper-article-plus-button")?.removeEventListener("click", handlePlusButtonClick);
@@ -220,6 +248,11 @@ const LandingPage = ({
             <button onClick={()=> {
                 setSelectType(SelectType.ARTICLE);
             }}>article select</button>
+            <button
+            onClick={()=> {
+                testCSSParse(selectedElements.get(currentSelectedElementKey.current) as HTMLElement);
+            }}
+            >get stile</button>
         </>
     );
 }
