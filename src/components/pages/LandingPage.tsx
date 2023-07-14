@@ -1,146 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { WrapperTypes, createNewWrapper, createSelectionContainer, isElementViable, krisinoteDOMParser, removeSelectionContainer } from "../../utils/lib";
-
-
-const testCSSParse = (el: HTMLElement) => {
-    const cloned = krisinoteDOMParser(el);
-
-
-    // just for testing purposes
-    const testBox = document.createElement("div");
-    testBox.style.position = "fixed";
-    testBox.style.left = "12px";
-    testBox.style.top = "12px";
-    testBox.style.padding = "5px";
-    testBox.style.width = "1200px";
-    testBox.style.height = "900px";
-    testBox.style.overflowY = "scroll";
-    testBox.style.overflowX = "scroll";
-    testBox.style.zIndex = "99999";
-    testBox.style.backgroundColor = "#ffffff";
-    document.body.appendChild(testBox);
-    testBox.appendChild(cloned);
-
-}
-enum SelectType {
-    ARTICLE = "ARTICLE",
-    SIMPLIFIED_ARTICLE = "SIMPLIFIED_ARTICLE"
-}
-
-const getArticleSelectionEl = (): HTMLElement => {
-    let docToBeReturned = document.querySelector("main article") as HTMLElement| null;
-    console.log("doc to be returned", docToBeReturned);
-    if(!docToBeReturned) {
-
-        docToBeReturned = document.querySelector("article") as HTMLElement | null;
-    }
-    if(!docToBeReturned) {
-        docToBeReturned = document.querySelector("body") as HTMLElement;
-    }
-    return docToBeReturned;
-}
-
-const putButtons = (id:number): void => {
-    console.log("new buttons are put for",id);
-    const selectionWrapper = document.getElementById(`krisinote-clipper-selection-wrapper-${id}`) as HTMLElement;
-
-    selectionWrapper.style.position = "absolute";
-
-    let plusIcon = document.createElement("div");
-    plusIcon.style.width = "20px";
-    plusIcon.style.height = "20px";
-    plusIcon.style.borderRadius = "2px 0 0 2px";
-    plusIcon.style.backgroundColor = "black";
-    plusIcon.style.boxShadow = "0 0 0 2px black";
-    plusIcon.style.position = "relative";
-    plusIcon.style.margin = "auto";
-    let plusLine1 = document.createElement("div");
-    plusLine1.style.width = "10px";
-    plusLine1.style.height = "2px";
-    plusLine1.style.backgroundColor = "white";
-    plusLine1.style.position = "absolute";
-    plusLine1.style.top = "50%";
-    plusLine1.style.left = "50%";
-    plusLine1.style.transform = "translate(-50%, -50%)";
-    let plusLine2 = document.createElement("div");
-    plusLine2.style.width = "2px";
-    plusLine2.style.height = "10px";
-    plusLine2.style.backgroundColor = "white";
-    plusLine2.style.position = "absolute";
-    plusLine2.style.top = "50%";
-    plusLine2.style.left = "50%";
-    plusLine2.style.transform = "translate(-50%, -50%)";
-    plusIcon.appendChild(plusLine1);
-    plusIcon.appendChild(plusLine2);
-
-    let plusButton = document.createElement("div");
-    plusButton.id = "krisinote-clipper-article-plus-button";
-    plusButton.style.width = "27px";
-    plusButton.style.height = "24px";
-    plusButton.style.cursor = "pointer";
-
-    plusButton.appendChild(plusIcon);
-
-    let minusIcon = document.createElement("div");
-    minusIcon.style.width = "20px";
-    minusIcon.style.height = "20px";
-    minusIcon.style.borderRadius = "0 2px 2px 0";
-    minusIcon.style.backgroundColor = "black";
-    minusIcon.style.boxShadow = "0 0 0 2px black";
-    minusIcon.style.position = "relative";
-    minusIcon.style.margin = "auto";
-    let minusLine = document.createElement("div");
-    minusLine.style.width = "10px";
-    minusLine.style.height = "2px";
-    minusLine.style.backgroundColor = "white";
-    minusLine.style.position = "absolute";
-    minusLine.style.top = "50%";
-    minusLine.style.left = "50%";
-    minusLine.style.transform = "translate(-50%, -50%)";
-    minusIcon.appendChild(minusLine);
-
-
-    let minusButton = document.createElement("div");
-    minusButton.id = "krisinote-clipper-article-minus-button";
-    minusButton.style.width = "27px";
-    minusButton.style.height = "24px";
-    minusButton.style.cursor = "pointer";
-    
-    minusButton.appendChild(minusIcon);
-
-    let topElement = document.createElement("div");
-    topElement.style.position = "absolute";
-    topElement.style.top = "-12px";
-    topElement.style.left = "50%";
-    topElement.style.width = "54px";
-    topElement.style.height = "24px";
-    topElement.style.display = "flex";
-    topElement.style.flexDirection = "row";
-    topElement.style.pointerEvents = "all";
-
-    topElement.appendChild(plusButton);
-    topElement.appendChild(minusButton);
-    
-    selectionWrapper.appendChild(topElement);
-}
-
-const createNewSpecialWrapper = (outlinedElement: HTMLElement, selectionContainer: HTMLElement, id: number, eventHandlers: {
-    handlePlusButtonClick: () => void,
-    handleMinusButtonClick: () => void,
-}) => {
-    // get current wrapper
-    const currentSelectedElementWrapper = selectionContainer?.firstElementChild as HTMLElement;
-    document.getElementById("krisinote-clipper-article-plus-button")?.removeEventListener("click", eventHandlers.handlePlusButtonClick);
-    document.getElementById("krisinote-clipper-article-minus-button")?.removeEventListener("click", eventHandlers.handleMinusButtonClick);
-    document.getElementById("krisinote-clipper-selection-container")?.removeChild(currentSelectedElementWrapper);
-
-    createNewWrapper(outlinedElement, selectionContainer as HTMLElement, WrapperTypes.selection, id);
-    putButtons(id);
-    document.getElementById("krisinote-clipper-article-plus-button")?.addEventListener("click", eventHandlers.handlePlusButtonClick);
-    document.getElementById("krisinote-clipper-article-minus-button")?.addEventListener("click", eventHandlers.handleMinusButtonClick);
-}
-
-
+import { SelectType, WrapperTypes, createNewSpecialWrapper, createNewWrapper, createSelectionContainer, getArticleSelectionEl, isElementViable, krisinoteDOMParser, parseDomTree, putButtons, removeSelectionContainer, removeWrappers } from "../../utils/lib";
 
 
 const LandingPage = ({
@@ -217,10 +76,17 @@ const LandingPage = ({
 
     useEffect(() => {
         if(selectionContainer){
-            createNewWrapper(getArticleSelectionEl(), selectionContainer as HTMLElement, WrapperTypes.selection, currentSelectedElementKey.current);
-            putButtons(currentSelectedElementKey.current);
-
-              
+            // removeWrappers();
+            if(selectType === SelectType.ARTICLE) {
+                createNewSpecialWrapper(getArticleSelectionEl(), selectionContainer as HTMLElement, currentSelectedElementKey.current, {handlePlusButtonClick, handleMinusButtonClick});
+            } else if(selectType === SelectType.FULL_PAGE) {
+                createNewSpecialWrapper(document.body, selectionContainer as HTMLElement, currentSelectedElementKey.current, {handlePlusButtonClick, handleMinusButtonClick});
+            }
+        }
+    }, [selectType]);
+    
+    useEffect(() => {
+        if(selectionContainer){
             // attach new event listeners
             document.getElementById("krisinote-clipper-article-plus-button")?.addEventListener("click", handlePlusButtonClick);
             document.getElementById("krisinote-clipper-article-minus-button")?.addEventListener("click", handleMinusButtonClick);
@@ -248,9 +114,12 @@ const LandingPage = ({
             <button onClick={()=> {
                 setSelectType(SelectType.ARTICLE);
             }}>article select</button>
+            <button onClick={()=> {
+                setSelectType(SelectType.FULL_PAGE);
+            }}>full page select</button>
             <button
             onClick={()=> {
-                testCSSParse(selectedElements.get(currentSelectedElementKey.current) as HTMLElement);
+                parseDomTree(selectedElements.get(currentSelectedElementKey.current) as HTMLElement);
             }}
             >get stile</button>
         </>
