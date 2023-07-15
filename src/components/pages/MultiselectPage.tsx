@@ -1,6 +1,5 @@
-import { HtmlHTMLAttributes, useEffect, useRef, useState } from "react";
-import { WrapperTypes, createNewWrapper, createSelectionContainer, findAndAnnihilateChildren, getElementDepth, getViableOutlinedElement, krisinoteDOMParser, removeHoverWrapper, removeSelectionContainer, parseDomTree } from "../../utils/lib";
-
+import { useEffect, useRef, useState } from "react";
+import { WrapperTypes, createNewWrapper, createSelectionContainer, findAndAnnihilateChildren, getElementDepth, krisinoteDOMParser, removeHoverWrapper, removeSelectionContainer, parseDomTree, MultiSelectionTypes, getViableParent } from "../../utils/lib";
 
 
 const MultiselectPage = () => {
@@ -12,6 +11,8 @@ const MultiselectPage = () => {
         console.log("runs creation of cont");
         return createSelectionContainer();
     });
+
+    let multiSelectionType = useRef<MultiSelectionTypes>(MultiSelectionTypes.ALL);
 
     // stores outlined elements in state
     const [selectedElements, setSelectedElements] = useState<Map<number, HTMLElement>>(new Map());
@@ -28,9 +29,12 @@ const MultiselectPage = () => {
             && !(hoveredElement.id.startsWith("react-chrome-app")) 
             && !(hoveredElement.nodeName === "IFRAME")
         ) {
-            let outlinedElement: HTMLElement = getViableOutlinedElement(hoveredElement);
+            let outlinedElement: HTMLElement | null = getViableOutlinedElement(hoveredElement);
+            console.log("hovered element", outlinedElement);
+            if(!outlinedElement) return;
             
             createNewWrapper(outlinedElement, selectionContainer as HTMLElement, WrapperTypes.hover);
+            
         }
     }
 
@@ -40,7 +44,12 @@ const MultiselectPage = () => {
 
 
     const handleClickEvent = (event: MouseEvent) : void => {
-        let outlinedElement: HTMLElement = getViableOutlinedElement(event.target as HTMLElement);
+        event.preventDefault();
+        let outlinedElement: HTMLElement | null = getViableOutlinedElement(event.target as HTMLElement);
+        console.log("outlined element on click", outlinedElement);
+        console.log("selected elements on click", selectedElements);
+
+        if(!outlinedElement) return;
         
         if(outlinedElement.id.startsWith("react-chrome-app") && outlinedElement.nodeName === "IFRAME") {
             //
@@ -72,23 +81,31 @@ const MultiselectPage = () => {
         }
     }
 
+    const getViableOutlinedElement = (hoveredElement: HTMLElement): HTMLElement | null => {
+        const outlinedElement = getViableParent(hoveredElement);
+        if(multiSelectionType.current === MultiSelectionTypes.ALL) {
+            return outlinedElement;
+        } else if(multiSelectionType.current === MultiSelectionTypes.PARAGRAPH) {
+            return outlinedElement.nodeName === "P" || outlinedElement.id.startsWith("krisinote-clipper-selection-wrapper") ? outlinedElement : null;
+        } else return null;
+    }
+
+    // that's the working version - version 2 of event handlers is the initial one
     useEffect(()=> {
-        if(selectionContainer) {
-            console.log("runs attaching of events");
-            document.addEventListener('mouseover', handleMouseOverEvent);
-            document.addEventListener("mouseout", handleMouseOutEvent);
-            document.addEventListener("click", handleClickEvent)
-        }
+        document.addEventListener('mouseover', handleMouseOverEvent);
+        document.addEventListener("mouseout", handleMouseOutEvent);
+        document.addEventListener("click", handleClickEvent);
 
         return () => {
             // clean-up
             document.removeEventListener('mouseover', handleMouseOverEvent);
             document.removeEventListener("mouseout", handleMouseOutEvent);
             document.removeEventListener("click", handleClickEvent);
-            removeSelectionContainer();
+            if(selectionContainer) {
+                removeSelectionContainer();
+            }
         }
-
-    },[]);
+    }, [])
 
     return ( 
         <>
@@ -97,9 +114,15 @@ const MultiselectPage = () => {
             <div>some block content {selectedElements.size}</div>
             <button
                 onClick={()=> {
-                    console.log(window.getComputedStyle((document.getElementById("krisinote-clipper-iframe") as HTMLIFrameElement).contentDocument?.getElementById("krisinote-pages-container") as HTMLElement).height)
+                    console.log("runs setting stata");
+                    multiSelectionType.current = MultiSelectionTypes.PARAGRAPH;
                 }}
-            >some button</button>
+            >only paragraph select</button>
+            <button
+                onClick={()=> {
+                    multiSelectionType.current = MultiSelectionTypes.ALL;
+                }}
+            >all select</button>
             <button
             onClick={()=> {
                 parseDomTree(selectedElements.get(counterAutoIncr.current-1) as HTMLElement);

@@ -1,10 +1,15 @@
 export {}
 
-export const unviableElements = ["SPAN", "A", "I", "IFRAME", "B", "SVG", "PATH", "HR", "SUP"]
+export const unviableElements = ["SPAN", "A", "I", "IFRAME", "B", "svg", "PATH", "HR", "SUP", "ellipse", "circle", "g"];
 
 export enum WrapperTypes {
     hover = "hover",
     selection = "selection"
+}
+
+export enum MultiSelectionTypes {
+    ALL = "ALL",
+    PARAGRAPH = "PARAGRAPH"
 }
 
 export const removeWrappers = (): void => {
@@ -18,8 +23,8 @@ export const removeWrappers = (): void => {
 }
 
 export const isElementViable = (element: HTMLElement): boolean => {
-    return window.getComputedStyle(element).getPropertyValue("display") !== "inline" 
-            && !(unviableElements.includes(element.tagName)) 
+    return window.getComputedStyle(element).getPropertyValue("display") !== "inline"
+            && !(unviableElements.includes(element.nodeName)) 
             && element.id !== "krisinote-clipper-selection-container";
 }
 
@@ -28,17 +33,6 @@ export const getViableParent = (element: HTMLElement): HTMLElement => {
         return element;
     } else return getViableParent(element.parentElement as HTMLElement);
 }
-
-export const getViableOutlinedElement = (hoveredElement: HTMLElement): HTMLElement => {
-    let outlinedElement: HTMLElement | null = null;
-    if(!isElementViable(hoveredElement)) {
-        outlinedElement = getViableParent(hoveredElement);
-    } else {
-        outlinedElement = hoveredElement;
-    }
-    return outlinedElement;
-}
-
 
 export const createSelectionContainer = (): HTMLElement => {
     const selectionContainer = document.createElement("div");
