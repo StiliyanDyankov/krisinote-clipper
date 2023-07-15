@@ -23,6 +23,8 @@ export const removeWrappers = (): void => {
 }
 
 export const isElementViable = (element: HTMLElement): boolean => {
+    
+    console.log(document.querySelectorAll(".react-chrome-app *"));
     return window.getComputedStyle(element).getPropertyValue("display") !== "inline"
             && !(unviableElements.includes(element.nodeName)) 
             && element.id !== "krisinote-clipper-selection-container";
@@ -56,7 +58,7 @@ export const createNewWrapper = (outlinedElement: HTMLElement, selectionContaine
 
     hoverWrapper.id = `krisinote-clipper-${type}-wrapper${id? "-" + id: ""}`;
     
-    hoverWrapper.style.border = "3px solid blue";
+    hoverWrapper.style.border = "3px solid #8c93c0";
     hoverWrapper.style.backgroundColor = "rgba(0,0,0,0.3)";
     hoverWrapper.style.position = "absolute";
     hoverWrapper.style.zIndex = "99998";
@@ -122,7 +124,7 @@ export const getElementDepth = (element: HTMLElement, counter: number = 0): numb
     else return getElementDepth(element.parentElement as HTMLElement, counter+1); 
 }
 
-export const parseDomTree = (el: HTMLElement) => {
+export const parseDomTree = async (el: HTMLElement) => {
     const cloned = krisinoteDOMParser(el);
 
     const xmls = new XMLSerializer();
@@ -194,8 +196,8 @@ export const putButtons = (id:number): void => {
     plusIcon.style.width = "20px";
     plusIcon.style.height = "20px";
     plusIcon.style.borderRadius = "2px 0 0 2px";
-    plusIcon.style.backgroundColor = "black";
-    plusIcon.style.boxShadow = "0 0 0 2px black";
+    plusIcon.style.backgroundColor = "#292e4c";
+    plusIcon.style.boxShadow = "0 0 0 2px #292e4c";
     plusIcon.style.position = "relative";
     plusIcon.style.margin = "auto";
     let plusLine1 = document.createElement("div");
@@ -229,8 +231,8 @@ export const putButtons = (id:number): void => {
     minusIcon.style.width = "20px";
     minusIcon.style.height = "20px";
     minusIcon.style.borderRadius = "0 2px 2px 0";
-    minusIcon.style.backgroundColor = "black";
-    minusIcon.style.boxShadow = "0 0 0 2px black";
+    minusIcon.style.backgroundColor = "#292e4c";
+    minusIcon.style.boxShadow = "0 0 0 2px #292e4c";
     minusIcon.style.position = "relative";
     minusIcon.style.margin = "auto";
     let minusLine = document.createElement("div");

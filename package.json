@@ -5,15 +5,11 @@
   "dependencies": {
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
-    "@mui/material": "^5.13.7",
+    "@mui/icons-material": "^5.14.0",
+    "@mui/material": "^5.14.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    "@types/chrome": "^0.0.239",
-    "@types/jest": "^27.5.2",
-    "@types/node": "^16.18.38",
-    "@types/react": "^18.2.14",
-    "@types/react-dom": "^18.2.6",
     "computed-style-to-inline-style": "^3.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -48,6 +44,11 @@
     ]
   },
   "devDependencies": {
+    "@types/chrome": "^0.0.239",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.38",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
     "ts-loader": "^9.4.4",
     "webpack": "^5.88.1",
     "webpack-cli": "^5.1.4"

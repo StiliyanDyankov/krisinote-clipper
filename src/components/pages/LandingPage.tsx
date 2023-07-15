@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { SelectType, WrapperTypes, createNewSpecialWrapper, createNewWrapper, createSelectionContainer, getArticleSelectionEl, isElementViable, krisinoteDOMParser, parseDomTree, putButtons, removeSelectionContainer, removeWrappers } from "../../utils/lib";
+import { Button, CircularProgress, Divider, IconButton, TextField } from "@mui/material";
+import LibraryAddOutlinedIcon from '@mui/icons-material/LibraryAddOutlined';
+import ArticleOutlinedIcon from '@mui/icons-material/ArticleOutlined';
+import NewspaperOutlinedIcon from '@mui/icons-material/NewspaperOutlined';
+import { colorsTailwind } from "../../App";
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 
 
 const LandingPage = ({
@@ -16,6 +22,8 @@ const LandingPage = ({
         }
         return createSelectionContainer();
     });
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const currentSelectedElementKey = useRef(9999);
 
@@ -77,22 +85,23 @@ const LandingPage = ({
     useEffect(() => {
         if(selectionContainer){
             // removeWrappers();
+            console.log("runs")
             if(selectType === SelectType.ARTICLE) {
+                setSelectedElements(new Map<number,HTMLElement>().set(currentSelectedElementKey.current, getArticleSelectionEl()))
                 createNewSpecialWrapper(getArticleSelectionEl(), selectionContainer as HTMLElement, currentSelectedElementKey.current, {handlePlusButtonClick, handleMinusButtonClick});
             } else if(selectType === SelectType.FULL_PAGE) {
+                setSelectedElements(new Map<number,HTMLElement>().set(currentSelectedElementKey.current, document.body))
                 createNewSpecialWrapper(document.body, selectionContainer as HTMLElement, currentSelectedElementKey.current, {handlePlusButtonClick, handleMinusButtonClick});
             }
         }
     }, [selectType]);
     
     useEffect(() => {
+        console.log(window);
         if(selectionContainer){
             // attach new event listeners
             document.getElementById("krisinote-clipper-article-plus-button")?.addEventListener("click", handlePlusButtonClick);
             document.getElementById("krisinote-clipper-article-minus-button")?.addEventListener("click", handleMinusButtonClick);
-
-            console.log(selectedElements.get(currentSelectedElementKey.current));
-
         }
         return () => {
             document.getElementById("krisinote-clipper-article-plus-button")?.removeEventListener("click", handlePlusButtonClick);
@@ -101,27 +110,116 @@ const LandingPage = ({
 
                 removeSelectionContainer();
             }
-            console.log("runs deletion of container");
         }
     }, []);
 
     return ( 
         <>
-            <h1>hello world</h1>
-            <button onClick={()=> {
-                onMultiSelectClick();
-            }}>Multiselect</button>
-            <button onClick={()=> {
-                setSelectType(SelectType.ARTICLE);
-            }}>article select</button>
-            <button onClick={()=> {
-                setSelectType(SelectType.FULL_PAGE);
-            }}>full page select</button>
-            <button
-            onClick={()=> {
-                parseDomTree(selectedElements.get(currentSelectedElementKey.current) as HTMLElement);
-            }}
-            >get stile</button>
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent:"flex-start",
+                    fontSize: "16px",
+                }}
+            >
+                <Button
+                    color="primary"
+                    variant="contained"
+                    disabled={isLoading}
+                    onClick={()=> {
+                        setIsLoading(true)
+                        console.log(selectedElements.get(currentSelectedElementKey.current) as HTMLElement)
+                        parseDomTree(selectedElements.get(currentSelectedElementKey.current) as HTMLElement).then(()=> {setIsLoading(false)})
+                    }}
+                    style={{
+                        fontWeight: "700",
+                        color: "#fff",
+                        fontSize: "16px",
+                        position: "relative"
+                    }}
+                    endIcon={isLoading? <CircularProgress color="secondary" /> : null}
+                >
+                    Save Clip
+                </Button>
+
+                <Divider
+                    style={{
+                        margin: "20px 0",
+                        backgroundColor: colorsTailwind["d-300-chips"]
+                    }}
+                />
+
+                <p
+                    style={{
+                        fontWeight: "500",
+                        color: "#fff",
+                        fontSize: "16px"
+                    }}
+                >
+                    Selection Modes:
+                </p>
+
+                <Button 
+                    color="secondary" 
+                    onClick={()=> {
+                        onMultiSelectClick();
+                    }}
+                    style={{
+                        justifyContent: "flex-start",
+                        textTransform: 'none',
+                        fontSize: "16px",
+                        paddingLeft: "16px",
+                    }}
+                    startIcon={<LibraryAddOutlinedIcon/>}
+                >
+                    Multi-Select
+                </Button>
+
+                <Button 
+                    color="secondary" 
+                    onClick={()=> {
+                        setSelectType(SelectType.ARTICLE);
+                    }}
+                    style={{
+                        justifyContent: "flex-start",
+                        textTransform: 'none',
+                        fontSize: "16px",
+                        paddingLeft: "16px",
+                    }}
+                    startIcon={<NewspaperOutlinedIcon/>}
+                    sx={{
+                        backgroundColor: selectType === SelectType.ARTICLE ?  "rgba(255,255,255,0.1)" : "initial",
+                    }}
+                    endIcon= { selectType === SelectType.ARTICLE ?  <CheckRoundedIcon/> : null}
+                >
+                    <span style={{ flexGrow: 3, justifyContent: "flex-start"}}>
+                        Article
+                    </span>
+                </Button>
+
+                <Button 
+                    color="secondary" 
+                    onClick={()=> {
+                        setSelectType(SelectType.FULL_PAGE);
+                    }}
+                    style={{
+                        justifyContent: "flex-start",
+                        textTransform: 'none',
+                        fontSize: "16px",
+                        paddingLeft: "16px",
+                    }}
+                    startIcon={<ArticleOutlinedIcon/>}
+                    sx={{
+                        backgroundColor: selectType === SelectType.FULL_PAGE ?  "rgba(255,255,255,0.1)" : "initial",
+                    }}
+                    endIcon= { selectType === SelectType.FULL_PAGE ?  <CheckRoundedIcon/> : null}
+                >
+                    <span style={{ flexGrow: 3, justifyContent: "flex-start"}}>
+                        Full Page
+                    </span>
+                </Button>
+            </div>
         </>
     );
 }

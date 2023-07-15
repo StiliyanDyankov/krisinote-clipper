@@ -1,5 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { WrapperTypes, createNewWrapper, createSelectionContainer, findAndAnnihilateChildren, getElementDepth, krisinoteDOMParser, removeHoverWrapper, removeSelectionContainer, parseDomTree, MultiSelectionTypes, getViableParent } from "../../utils/lib";
+import { Button, CircularProgress, Divider } from "@mui/material";
+import { colorsTailwind } from "../../App";
+import CodeRoundedIcon from '@mui/icons-material/CodeRounded';
+import NotesOutlinedIcon from '@mui/icons-material/NotesOutlined';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 
 
 const MultiselectPage = () => {
@@ -8,11 +13,12 @@ const MultiselectPage = () => {
         if(document.getElementById("krisinote-clipper-selection-container")) {
            document.body.removeChild(document.getElementById("krisinote-clipper-selection-container") as Node);
         }
-        console.log("runs creation of cont");
         return createSelectionContainer();
     });
 
     let multiSelectionType = useRef<MultiSelectionTypes>(MultiSelectionTypes.ALL);
+
+    const [multiSelectionTypePseudo, setMultiSelectionTypePseudo] = useState<MultiSelectionTypes>(MultiSelectionTypes.ALL);
 
     // stores outlined elements in state
     const [selectedElements, setSelectedElements] = useState<Map<number, HTMLElement>>(new Map());
@@ -20,6 +26,8 @@ const MultiselectPage = () => {
     const [selectedElementsDepth, setSelectedElementsDepth] = useState<Map<number, number>>(new Map());
 
     let counterAutoIncr = useRef(1);
+
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleMouseOverEvent = (event: MouseEvent): void => {
         let hoveredElement = event.target as HTMLElement;                                                                                
@@ -30,7 +38,6 @@ const MultiselectPage = () => {
             && !(hoveredElement.nodeName === "IFRAME")
         ) {
             let outlinedElement: HTMLElement | null = getViableOutlinedElement(hoveredElement);
-            console.log("hovered element", outlinedElement);
             if(!outlinedElement) return;
             
             createNewWrapper(outlinedElement, selectionContainer as HTMLElement, WrapperTypes.hover);
@@ -46,8 +53,6 @@ const MultiselectPage = () => {
     const handleClickEvent = (event: MouseEvent) : void => {
         event.preventDefault();
         let outlinedElement: HTMLElement | null = getViableOutlinedElement(event.target as HTMLElement);
-        console.log("outlined element on click", outlinedElement);
-        console.log("selected elements on click", selectedElements);
 
         if(!outlinedElement) return;
         
@@ -82,8 +87,17 @@ const MultiselectPage = () => {
     }
 
     const getViableOutlinedElement = (hoveredElement: HTMLElement): HTMLElement | null => {
+        let isOutside = true;
+        document.querySelectorAll("#react-chrome-app * , #react-chrome-app").forEach(node => {
+            console.log("node", node,"element", hoveredElement)
+            if (node === hoveredElement) {
+                isOutside = false;
+                return;
+        }});
         const outlinedElement = getViableParent(hoveredElement);
-        if(multiSelectionType.current === MultiSelectionTypes.ALL) {
+        if(!isOutside) {
+            return null;
+        } else if(multiSelectionType.current === MultiSelectionTypes.ALL) {
             return outlinedElement;
         } else if(multiSelectionType.current === MultiSelectionTypes.PARAGRAPH) {
             return outlinedElement.nodeName === "P" || outlinedElement.id.startsWith("krisinote-clipper-selection-wrapper") ? outlinedElement : null;
@@ -109,25 +123,98 @@ const MultiselectPage = () => {
 
     return ( 
         <>
-            <h1>hello MultiselectPage</h1>
-            <p>some paragraph content</p>
-            <div>some block content {selectedElements.size}</div>
-            <button
-                onClick={()=> {
-                    console.log("runs setting stata");
-                    multiSelectionType.current = MultiSelectionTypes.PARAGRAPH;
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent:"flex-start",
+                    fontSize: "16px",
                 }}
-            >only paragraph select</button>
-            <button
-                onClick={()=> {
-                    multiSelectionType.current = MultiSelectionTypes.ALL;
-                }}
-            >all select</button>
-            <button
-            onClick={()=> {
-                parseDomTree(selectedElements.get(counterAutoIncr.current-1) as HTMLElement);
-            }}
-            >get stile</button>
+            >
+
+                <Button
+                    color="primary"
+                    variant="contained"
+                    disabled={!(selectedElements.size >= 1) || isLoading}
+                    onClick={()=> {
+                        setIsLoading(true)
+                        parseDomTree(selectedElements.get(counterAutoIncr.current-1) as HTMLElement).then(()=> {setIsLoading(false)})
+                    }}
+                    style={{
+                        fontWeight: "700",
+                        color: "#fff",
+                        fontSize: "16px",
+                        position: "relative"
+                    }}
+                    endIcon={isLoading? <CircularProgress color="secondary" style={{position: "absolute", right:"16px"}}/> : null}
+                >
+                    Save {selectedElements.size} {selectedElements.size > 1 ? "Selections" : selectedElements.size === 1 ? "Selection" : ""}
+                </Button>
+
+                <Divider
+                    style={{
+                        margin: "20px 0",
+                        backgroundColor: colorsTailwind["d-300-chips"]
+                    }}
+                />
+
+                <p
+                    style={{
+                        fontWeight: "500",
+                        color: "#fff",
+                        fontSize: "16px"
+                    }}
+                >
+                    Selection Modes:
+                </p>
+
+
+                <Button 
+                    color="secondary" 
+                    onClick={()=> {
+                        multiSelectionType.current = MultiSelectionTypes.ALL;
+                        setMultiSelectionTypePseudo(MultiSelectionTypes.ALL);
+                    }}
+                    style={{
+                        justifyContent: "flex-start",
+                        textTransform: 'none',
+                        fontSize: "16px",
+                        paddingLeft: "16px",
+                    }}
+                    startIcon={<CodeRoundedIcon/>}
+                    sx={{
+                        backgroundColor: multiSelectionTypePseudo === MultiSelectionTypes.ALL ?  "rgba(255,255,255,0.1)" : "initial",
+                    }}
+                    endIcon= { multiSelectionTypePseudo === MultiSelectionTypes.ALL ?  <CheckRoundedIcon/> : null}
+                >
+                    <span style={{ flexGrow: 3, justifyContent: "flex-start"}}>
+                        All elements
+                    </span>
+                </Button>
+
+                <Button 
+                    color="secondary" 
+                    onClick={()=> {
+                        multiSelectionType.current = MultiSelectionTypes.PARAGRAPH;
+                        setMultiSelectionTypePseudo(MultiSelectionTypes.PARAGRAPH);
+                    }}
+                    style={{
+                        justifyContent: "flex-start",
+                        textTransform: 'none',
+                        fontSize: "16px",
+                        paddingLeft: "16px",
+                    }}
+                    sx={{
+                        backgroundColor: multiSelectionTypePseudo === MultiSelectionTypes.PARAGRAPH ?  "rgba(255,255,255,0.1)" : "initial",
+                    }}
+                    startIcon={<NotesOutlinedIcon/>}
+                    endIcon= { multiSelectionTypePseudo === MultiSelectionTypes.PARAGRAPH ?  <CheckRoundedIcon/> : null}
+                >
+                    <span style={{ flexGrow: 3, justifyContent: "flex-start"}}>
+                        Paragraphs only
+                    </span>
+                </Button>
+            </div>
         </> 
     );
 }

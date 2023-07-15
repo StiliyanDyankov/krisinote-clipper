@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-let root: any = null
+export let root: any = null 
 const rootElement = document.createElement("div");
 rootElement.style.position = "fixed";
 rootElement.style.right = "12px";
@@ -23,6 +23,14 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 		root = ReactDOM.createRoot(
 			rootElement
 		);
+
+		root.render(
+			<React.StrictMode>
+				<App />
+			</React.StrictMode>
+		);    
+	} else {
+		root.unmount();
 	}
 
 	if (request.type === 'executeContentScript') {
