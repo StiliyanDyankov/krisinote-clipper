@@ -121,6 +121,14 @@ const MultiselectPage = () => {
         }
     }, [])
 
+    useEffect(()=> {
+        if(isLoading) {
+            parseDomTree(selectedElements.get(counterAutoIncr.current-1) as HTMLElement)
+            setIsLoading(false);
+        }
+    }, [isLoading])
+    
+
     return ( 
         <>
             <div
@@ -138,7 +146,6 @@ const MultiselectPage = () => {
                     disabled={!(selectedElements.size >= 1) || isLoading}
                     onClick={()=> {
                         setIsLoading(true)
-                        parseDomTree(selectedElements.get(counterAutoIncr.current-1) as HTMLElement).then(()=> {setIsLoading(false)})
                     }}
                     style={{
                         fontWeight: "700",

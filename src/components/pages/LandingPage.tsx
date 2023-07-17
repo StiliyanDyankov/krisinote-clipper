@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { SelectType, WrapperTypes, createNewSpecialWrapper, createNewWrapper, createSelectionContainer, getArticleSelectionEl, isElementViable, krisinoteDOMParser, parseDomTree, putButtons, removeSelectionContainer, removeWrappers } from "../../utils/lib";
 import { Button, CircularProgress, Divider, IconButton, TextField } from "@mui/material";
 import LibraryAddOutlinedIcon from '@mui/icons-material/LibraryAddOutlined';
@@ -7,22 +7,21 @@ import NewspaperOutlinedIcon from '@mui/icons-material/NewspaperOutlined';
 import { colorsTailwind } from "../../App";
 import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 
-
+let counter = 1;
 const LandingPage = ({
     onMultiSelectClick
 }:{
     onMultiSelectClick: () => void;
 }) => {
-
     const [selectType, setSelectType] = useState<SelectType>(SelectType.ARTICLE);
-
+    
     const [selectionContainer, setSelectionContainer] = useState<HTMLElement | null>(()=> {
         if(document.getElementById("krisinote-clipper-selection-container")) {
-           document.body.removeChild(document.getElementById("krisinote-clipper-selection-container") as Node);
+            document.body.removeChild(document.getElementById("krisinote-clipper-selection-container") as Node);
         }
         return createSelectionContainer();
     });
-
+    
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const currentSelectedElementKey = useRef(9999);
@@ -32,7 +31,6 @@ const LandingPage = ({
         selEl.set(currentSelectedElementKey.current, getArticleSelectionEl());
         return selEl;
     });
-
 
     const handlePlusButtonClick = () => {
         const currentSelectedEl = selectedElements.get(currentSelectedElementKey.current);
@@ -81,11 +79,10 @@ const LandingPage = ({
             )
         }
     }
-
+   
     useEffect(() => {
         if(selectionContainer){
             // removeWrappers();
-            console.log("runs")
             if(selectType === SelectType.ARTICLE) {
                 setSelectedElements(new Map<number,HTMLElement>().set(currentSelectedElementKey.current, getArticleSelectionEl()))
                 createNewSpecialWrapper(getArticleSelectionEl(), selectionContainer as HTMLElement, currentSelectedElementKey.current, {handlePlusButtonClick, handleMinusButtonClick});
@@ -95,6 +92,9 @@ const LandingPage = ({
             }
         }
     }, [selectType]);
+    
+    
+
     
     useEffect(() => {
         console.log(window);
@@ -107,11 +107,20 @@ const LandingPage = ({
             document.getElementById("krisinote-clipper-article-plus-button")?.removeEventListener("click", handlePlusButtonClick);
             document.getElementById("krisinote-clipper-article-minus-button")?.removeEventListener("click", handleMinusButtonClick);
             if(document.getElementById("krisinote-clipper-selection-container") && document.getElementById("krisinote-clipper-selection-container")?.children.length){
-
                 removeSelectionContainer();
             }
         }
     }, []);
+
+    useEffect(()=> {
+        if(isLoading) {
+            parseDomTree(selectedElements.get(currentSelectedElementKey.current) as HTMLElement).then(()=> {setIsLoading(false)})
+        }
+    }, [isLoading])
+
+    const handleClick = () => {
+        setIsLoading(true)
+    }
 
     return ( 
         <>
@@ -123,24 +132,21 @@ const LandingPage = ({
                     fontSize: "16px",
                 }}
             >
+                {isLoading? "fdsfsdfsdfsdffds" : "Save Clip"}
                 <Button
                     color="primary"
                     variant="contained"
                     disabled={isLoading}
-                    onClick={()=> {
-                        setIsLoading(true)
-                        console.log(selectedElements.get(currentSelectedElementKey.current) as HTMLElement)
-                        parseDomTree(selectedElements.get(currentSelectedElementKey.current) as HTMLElement).then(()=> {setIsLoading(false)})
-                    }}
+                    onClick={handleClick}
                     style={{
                         fontWeight: "700",
                         color: "#fff",
                         fontSize: "16px",
                         position: "relative"
                     }}
-                    endIcon={isLoading? <CircularProgress color="secondary" /> : null}
                 >
-                    Save Clip
+                    {isLoading? "Loading..." : "Save Clip"}
+                    {isLoading? <CircularProgress color="secondary" /> : null}
                 </Button>
 
                 <Divider

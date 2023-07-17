@@ -15,7 +15,7 @@ export enum MultiSelectionTypes {
 export const removeWrappers = (): void => {
     const selectionContainer = document.getElementById("krisinote-clipper-selection-container");
     if(selectionContainer) {
-        console.log("tries to remove", selectionContainer.childNodes);
+        // console.log("tries to remove", selectionContainer.childNodes);
         selectionContainer.childNodes.forEach((wrapper)=> {
             selectionContainer.removeChild(wrapper);
         })
@@ -24,7 +24,7 @@ export const removeWrappers = (): void => {
 
 export const isElementViable = (element: HTMLElement): boolean => {
     
-    console.log(document.querySelectorAll(".react-chrome-app *"));
+    // console.log(document.querySelectorAll(".react-chrome-app *"));
     return window.getComputedStyle(element).getPropertyValue("display") !== "inline"
             && !(unviableElements.includes(element.nodeName)) 
             && element.id !== "krisinote-clipper-selection-container";
@@ -52,7 +52,7 @@ export const removeSelectionContainer = (): void => {
 
 export const createNewWrapper = (outlinedElement: HTMLElement, selectionContainer: HTMLElement, type: WrapperTypes, id: number | null = null): HTMLElement => {
 
-    console.log("outlined element", outlinedElement);
+    // console.log("outlined element", outlinedElement);
 
     const hoverWrapper = document.createElement("div");
 
@@ -153,14 +153,14 @@ export const parseDomTree = async (el: HTMLElement) => {
     // try to get all link elements
     const link = document.querySelectorAll('head link');
 
-    console.log(performance
-        .getEntries()
-        .map((entry) => {
-            return entry.name;
-        })
-        .filter((url) => { 
-            return url.includes('.woff') || url.includes("font");
-        }))
+    // console.log(performance
+    //     .getEntries()
+    //     .map((entry) => {
+    //         return entry.name;
+    //     })
+    //     .filter((url) => { 
+    //         return url.includes('.woff') || url.includes("font");
+    //     }))
 }
 
 
@@ -173,7 +173,7 @@ export enum SelectType {
 
 export const getArticleSelectionEl = (): HTMLElement => {
     let docToBeReturned = document.querySelector("main article") as HTMLElement| null;
-    console.log("doc to be returned", docToBeReturned);
+    // console.log("doc to be returned", docToBeReturned);
     if(!docToBeReturned) {
 
         docToBeReturned = document.querySelector("article") as HTMLElement | null;
@@ -185,7 +185,7 @@ export const getArticleSelectionEl = (): HTMLElement => {
 }
 
 export const putButtons = (id:number): void => {
-    console.log("new buttons are put for",id);
+    // console.log("new buttons are put for",id);
     const selectionWrapper = document.getElementById(`krisinote-clipper-selection-wrapper-${id}`) as HTMLElement;
 
 
@@ -276,7 +276,7 @@ export const createNewSpecialWrapper = (outlinedElement: HTMLElement, selectionC
 }) => {
     // get current wrapper
     const currentSelectedElementWrapper = selectionContainer?.firstElementChild as HTMLElement;
-    console.log(currentSelectedElementWrapper);
+    // console.log(currentSelectedElementWrapper);
     if(currentSelectedElementWrapper) {
         document.getElementById("krisinote-clipper-article-plus-button")?.removeEventListener("click", eventHandlers.handlePlusButtonClick);
         document.getElementById("krisinote-clipper-article-minus-button")?.removeEventListener("click", eventHandlers.handleMinusButtonClick);
@@ -430,7 +430,7 @@ const parseDOMNode = (realElement: HTMLElement | null, clonedElement: HTMLElemen
         clonedElement.style.minHeight = "fit-content";
         clonedElement.style.overflowX = "hidden";
 
-        console.log("element qualifiest", clonedElement.nodeName)
+        // console.log("element qualifiest", clonedElement.nodeName)
         if(clonedElement.nodeName === "IMG" || clonedElement.nodeName === "svg" || clonedElement.nodeName === "I" || clonedElement.nodeName === "path") {
             if(realElement?.getAttribute("width")){
                 clonedElement?.removeAttribute("width");
