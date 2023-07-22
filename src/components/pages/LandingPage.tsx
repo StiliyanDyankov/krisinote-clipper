@@ -132,7 +132,6 @@ const LandingPage = ({
                     fontSize: "16px",
                 }}
             >
-                {isLoading? "fdsfsdfsdfsdffds" : "Save Clip"}
                 <Button
                     color="primary"
                     variant="contained"

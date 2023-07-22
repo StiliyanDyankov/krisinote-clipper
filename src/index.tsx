@@ -19,38 +19,24 @@ document.body.appendChild(rootElement);
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
-	if(!root || !(root._internalRoot)) {
-		root = ReactDOM.createRoot(
-			rootElement
-		);
+	processLifecycle(request);
 
-		root.render(
-			<React.StrictMode>
-				<App />
-			</React.StrictMode>
-		);    
-	} else {
-		root.unmount();
-	}
-
-	if (request.type === 'executeContentScript') {
-		console.log("run root",root);
-		root.render(
-			<React.StrictMode>
-				<App />
-			</React.StrictMode>
-		);    
-
-	} else if (request.type === "stopContentScript") {
-		// remove the service element from DOM
-
-		console.log("stop root",root);
-
-		// console.log("runs the root unmount command");
-
-		// const clipperDOMEl = document.getElementById("react-chrome-app");
-
-		// document.body.removeChild(clipperDOMEl as Node);
-		root.unmount();
-	}
 });
+
+function processLifecycle(request: any) {
+	if(request.type === 'LIFECYCLE_STATUS') {
+		if(!root || !(root._internalRoot)) {
+			root = ReactDOM.createRoot(
+				rootElement
+			);
+			
+			root.render(
+				<React.StrictMode>
+					<App id={request.id} onExit={processLifecycle}/>
+				</React.StrictMode>
+			);
+		} else {
+			root.unmount();
+		}
+	}
+}

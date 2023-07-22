@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import LandingPage from './components/pages/LandingPage';
 import MultiselectPage from './components/pages/MultiselectPage';
 import SaveProcessPage from './components/pages/SaveProcessPage';
@@ -6,15 +6,18 @@ import SaveSuccessPage from './components/pages/SaveSuccessPage';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { IconButton } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import { root } from '.';
+import AuthPage from './components/pages/AuthPage';
+import LoadingPage from './components/pages/LoadingPage';
 
 
 
 enum PageState {
+	UNAUTHORIZED = "UNAUTHORIZED",
 	LANDING = "LANDING",
 	MUTLISELECT = "MULTISELECT",
 	SAVE_PROCESS = "SAVE_PROCESS",
-	SAVE_SUCCESS = "SAVE_SUCCESS"
+	SAVE_SUCCESS = "SAVE_SUCCESS",
+	LOADING = "LOADING"
 }
 
 export const colorsTailwind = {
@@ -65,34 +68,74 @@ const theme = createTheme({
 	},
 });
 
-function App() {
 
-	const [pageState, setPageState] = useState<PageState>(PageState.LANDING);
+
+function App({id, onExit}: {id?: any; onExit: (request: any) => void}) {
+	
+	const [pageState, setPageState] = useState<PageState>(()=> {
+		return PageState.LOADING});
 	
 	const handleMultiselectClick = () => {
 		setPageState(PageState.MUTLISELECT);
 	}
 
+	chrome.runtime.onMessage.addListener(messageHandler);
+	
+	useEffect(() => { 
+
+		chrome.storage.local.remove(["token"], function() {
+			console.log('Data removed');
+		});
+
+		console.log(chrome.storage);
+
+		chrome.storage.local.get(['token'], function(result) {
+			console.log('Value currently is ' + result.token);
+			if(result.token && result.token.expiry > Date.now()) {
+				setPageState(PageState.LANDING);
+			} else {
+				setPageState(PageState.UNAUTHORIZED);
+			}
+		});
+
+		return ()=> {
+			chrome.runtime.onMessage.removeListener(messageHandler);
+		}
+	}, [])
+
+	function messageHandler(message: any) {
+		console.log("messages recieved in app", message)
+		if(message.type === "USER_AUTHENTICATED") {
+			chrome.storage.local.set({ token: { 
+				value: message.payload[0].result,
+				expiry: Date.now() + 1000 * 60 * 60 * 24
+			}}, function() {
+				setPageState(PageState.LANDING);
+			})
+		}
+	}
+
 	return (
 		<>
+		<div style={{all: "initial"}}>
+
 			<ThemeProvider theme={theme}>
 				<style>
 				{`
 					@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap');
-				`}
+					`}
 				</style>
 				<div
 					id='krisinote-pages-container'
 					style={{
 						fontFamily: "'Quicksand', sans-serif",
 						color: "#ffffff",
-						height: "400px",
 						padding: "10px",
 						backgroundColor: colorsTailwind["d-100-body-bg"],
 						border: `2px solid ${colorsTailwind["d-300-chips"]}`,
 						fontSize: "16px",
 					}}
-				>
+					>
 					<div
 						style={{
 							display: "flex",
@@ -102,38 +145,60 @@ function App() {
 							fontSize: "16px",
 							marginBottom: "5px"
 						}}
-					>
-						<h1
-							style={{
-								fontWeight: "500",
-								fontStyle: "italic",
-								fontSize: "16px"
-							}}
 						>
-							{document.head.getElementsByTagName("title").item(0)?.innerText}
-						</h1>
+						<div>
+							{ pageState === PageState.UNAUTHORIZED || pageState === PageState.LOADING ? null : 
+								<h1
+									style={{
+										fontWeight: "500",
+										fontStyle: "italic",
+										fontSize: "16px"
+									}}
+								>
+									{ document.head.getElementsByTagName("title").item(0)?.innerText }
+								</h1>
+							}
+							{ pageState === PageState.UNAUTHORIZED ? 
+								<h1
+									style={{
+										fontWeight: "500",
+										fontSize: "32px"
+									}}
+								>
+									<a href="https://www.krisinote.com/">KN</a>
+									
+								</h1>
+								: null
+							}
+						</div>
 
 						<IconButton 
 							onClick={()=> {
-								if(root) root.unmount();
+								onExit({ type: 'LIFECYCLE_STATUS' })
 							}}
 							sx={{
 								":hover": {
 									backgroundColor: "rgba(255,255,255,0.05)"
 								}
 							}}
-						>
+							>
 							<CloseRoundedIcon
 								style={{
 									fill: "#fff"
 								}}
-							/>
+								/>
 						</IconButton>
 					</div>
 					{
+						pageState === PageState.LOADING ? <LoadingPage/> : null 
+					}
+					{
+						pageState === PageState.UNAUTHORIZED ? <AuthPage/> : null 
+					}
+					{
 						pageState === PageState.LANDING ? 
 						<LandingPage 
-							onMultiSelectClick={handleMultiselectClick}
+						onMultiSelectClick={handleMultiselectClick}
 						/> : null
 					}
 					{
@@ -147,6 +212,8 @@ function App() {
 					}
 				</div>
 			</ThemeProvider>
+			</div>
+
 		</>
 	);
 }
