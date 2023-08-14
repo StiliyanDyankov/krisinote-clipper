@@ -124,15 +124,7 @@ export const getElementDepth = (element: HTMLElement, counter: number = 0): numb
     else return getElementDepth(element.parentElement as HTMLElement, counter+1); 
 }
 
-export const parseDomTree = async (el: HTMLElement) => {
-    const cloned = krisinoteDOMParser(el);
-
-    const xmls = new XMLSerializer();
-    xmls.serializeToString(cloned);
-
-
-
-    // just for testing purposes
+export const parseDomTree = async (el: HTMLElement | Map<Number, HTMLElement>, multiselect: boolean = false) => {
     const testBox = document.createElement("div");
     testBox.style.position = "fixed";
     testBox.style.left = "12px";
@@ -145,22 +137,96 @@ export const parseDomTree = async (el: HTMLElement) => {
     testBox.style.zIndex = "99999";
     testBox.style.backgroundColor = "#ffffff";
     document.body.appendChild(testBox);
-    testBox.insertAdjacentHTML("afterbegin", xmls.serializeToString(cloned))
+
+    if(multiselect) {
+        (el as Map<Number, HTMLElement>).forEach((el) => {
+            const cloned = krisinoteDOMParser(el as HTMLElement);
+
+        const xmls = new XMLSerializer();
+        const stringified = xmls.serializeToString(cloned);
+
+
+
+    // just for testing purposes
+    
+        testBox.insertAdjacentHTML("afterbegin", xmls.serializeToString(cloned))
+        const link = document.querySelectorAll('head link');
+
+        console.log(performance
+            .getEntries()
+            .map((entry) => {
+                return entry.name;
+            })
+            .filter((url) => { 
+                return url.includes('.woff') || url.includes("font");
+            }))
+        
+        const fontArr = performance
+                            .getEntries()
+                            .map((entry) => {
+                                return entry.name;
+                            })
+                            .filter((url) => { 
+                                return url.includes('.woff') || url.includes("font");
+                            })
+
+        console.log("font array", fontArr);
+        
+        const result = fontArr.map(font => `<link href="${font}" type="text/css" rel="stylesheet"/>`);
+
+        console.log("final result",result);
+
+        const finalRes = result.join("") + stringified;
+        console.log(finalRes);
+        })
+    } else {
+        const cloned = krisinoteDOMParser(el as HTMLElement);
+
+        const xmls = new XMLSerializer();
+        const stringified = xmls.serializeToString(cloned);
+
+
+
+    // just for testing purposes
+    
+        testBox.insertAdjacentHTML("afterbegin", xmls.serializeToString(cloned))
+        const link = document.querySelectorAll('head link');
+
+        console.log(performance
+            .getEntries()
+            .map((entry) => {
+                return entry.name;
+            })
+            .filter((url) => { 
+                return url.includes('.woff') || url.includes("font");
+            }))
+        
+        const fontArr = performance
+                            .getEntries()
+                            .map((entry) => {
+                                return entry.name;
+                            })
+                            .filter((url) => { 
+                                return url.includes('.woff') || url.includes("font");
+                            })
+
+        console.log("font array", fontArr);
+        
+        const result = fontArr.map(font => `<link href="${font}" type="text/css" rel="stylesheet"/>`);
+
+        console.log("final result",result);
+
+        const finalRes = result.join("") + stringified;
+        console.log(finalRes);
+    }
+
+    
     // testBox.appendChild(cloned);
 
 
 
     // try to get all link elements
-    const link = document.querySelectorAll('head link');
-
-    // console.log(performance
-    //     .getEntries()
-    //     .map((entry) => {
-    //         return entry.name;
-    //     })
-    //     .filter((url) => { 
-    //         return url.includes('.woff') || url.includes("font");
-    //     }))
+    
 }
 
 
@@ -334,7 +400,7 @@ const defaultStylesToBeCoppied = [
                                     "grid-column-start", "grid-column-end", "grid-row-start", "grid-row-end", "grid-column", "grid-row", "grid-area", "justify-self", "align-self", "place-self",
                                     
                                     "font-size", "font-style", "font-family", "font-weight", "overflow-wrap", "contain", "line-height", "tab-size", "text-size-adjust",
-                                    "text-transform", "letter-spacing", "vertical-align",
+                                    "text-transform", "letter-spacing", "vertical-align", "text-decoration",
                                     
                                     "border-color", "border-width", "border-style", 
                                     "border-bottom-left-radius", "border-bottom-right-radius", "border-top-left-radius", "border-top-right-radius", 
@@ -362,7 +428,7 @@ const sizingStylesToBeCoppied = [
 
                                 ];
 
-const INSERTION_VIEWPORT_WIDTH = 1200;
+const INSERTION_VIEWPORT_WIDTH = 1000;
 
 const parseGridTemplateColumns = (original: string): string => {
 
@@ -429,6 +495,81 @@ const parseDOMNode = (realElement: HTMLElement | null, clonedElement: HTMLElemen
         clonedElement.style.minWidth = "fit-content";
         clonedElement.style.minHeight = "fit-content";
         clonedElement.style.overflowX = "hidden";
+
+        if(clonedElement.nodeName === "IMG") {
+            console.log("here's an image", clonedElement);
+            console.log("src of img", (realElement as HTMLImageElement).getAttribute('src'));
+            
+            const imgPath = (realElement as HTMLImageElement).getAttribute('src')
+
+            if(imgPath) {
+                const isAbsoluteUrl = imgPath.indexOf("://") > 0 || imgPath.indexOf("//") === 0;
+
+                console.log(isAbsoluteUrl); // Output: true
+                if(!isAbsoluteUrl) {
+                    const origin = location.origin;
+
+                    console.log("origin", origin);
+                    const newUrl = origin + imgPath;
+
+                    console.log("new url",newUrl);
+                    (clonedElement as HTMLImageElement).setAttribute("src", newUrl)
+                } else {
+
+                }
+            }
+        }
+        console.log(clonedElement.nodeName)
+        if(clonedElement.nodeName === "A") {
+            console.log("here's an image", clonedElement);
+            console.log("src of img", (realElement as HTMLImageElement).getAttribute('href'));
+            
+            const imgPath = (realElement as HTMLImageElement).getAttribute('href')
+
+            if(imgPath) {
+                const isAbsoluteUrl = imgPath.indexOf("://") > 0 || imgPath.indexOf("//") === 0;
+
+                console.log(isAbsoluteUrl); // Output: true
+                if(!isAbsoluteUrl) {
+                    const origin = location.origin;
+
+                    console.log("origin", origin);
+                    const newUrl = origin + imgPath;
+
+                    console.log("new url",newUrl);
+                    (clonedElement as HTMLImageElement).setAttribute("href", newUrl)
+                } else {
+
+                }
+            }
+        }
+        if(clonedElement.nodeName === "SOURCE") {
+            console.log("here's an image", clonedElement);
+            console.log("src of img", (realElement as HTMLImageElement).getAttribute('srcset'));
+            
+            const imgPath = (realElement as HTMLImageElement).getAttribute('srcset')
+
+            if(imgPath) {
+                const isAbsoluteUrl = imgPath.indexOf("://") > 0 || imgPath.indexOf("//") === 0;
+
+                console.log(isAbsoluteUrl); // Output: true
+                if(!isAbsoluteUrl) {
+                    const origin = location.origin;
+
+                    console.log("origin", origin);
+                    const newUrl = origin + imgPath;
+
+                    console.log("new url",newUrl);
+                    (clonedElement as HTMLImageElement).setAttribute("srcset", newUrl)
+                } else {
+
+                }
+            }
+        }
+
+        if(clonedElement.nodeName === "SOURCE" || clonedElement.nodeName === "LINK" || clonedElement.nodeName === "IMG" || clonedElement.nodeName === "A") {
+            clonedElement.setAttribute("target", "_blank");
+        }
 
         // console.log("element qualifiest", clonedElement.nodeName)
         if(clonedElement.nodeName === "IMG" || clonedElement.nodeName === "svg" || clonedElement.nodeName === "I" || clonedElement.nodeName === "path") {

@@ -89,7 +89,7 @@ const MultiselectPage = () => {
     const getViableOutlinedElement = (hoveredElement: HTMLElement): HTMLElement | null => {
         let isOutside = true;
         document.querySelectorAll("#react-chrome-app * , #react-chrome-app").forEach(node => {
-            console.log("node", node,"element", hoveredElement)
+            // console.log("node", node,"element", hoveredElement)
             if (node === hoveredElement) {
                 isOutside = false;
                 return;
@@ -123,7 +123,7 @@ const MultiselectPage = () => {
 
     useEffect(()=> {
         if(isLoading) {
-            parseDomTree(selectedElements.get(counterAutoIncr.current-1) as HTMLElement)
+            parseDomTree(selectedElements, true)
             setIsLoading(false);
         }
     }, [isLoading])

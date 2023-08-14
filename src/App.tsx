@@ -83,9 +83,9 @@ function App({id, onExit}: {id?: any; onExit: (request: any) => void}) {
 	
 	useEffect(() => { 
 
-		chrome.storage.local.remove(["token"], function() {
-			console.log('Data removed');
-		});
+		// chrome.storage.local.remove(["token"], function() {
+		// 	console.log('Data removed');
+		// });
 
 		console.log(chrome.storage);
 

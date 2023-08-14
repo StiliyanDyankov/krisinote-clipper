@@ -114,6 +114,7 @@ const LandingPage = ({
 
     useEffect(()=> {
         if(isLoading) {
+            
             parseDomTree(selectedElements.get(currentSelectedElementKey.current) as HTMLElement).then(()=> {setIsLoading(false)})
         }
     }, [isLoading])
