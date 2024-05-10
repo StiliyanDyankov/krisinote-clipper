@@ -1,4 +1,5 @@
 const path = require("path");
+const { cwd } = require("process");
 
 module.exports = {
   entry: "./src/index.tsx",
@@ -23,7 +24,7 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   output: {
-    filename: "content.js",
-    path: path.resolve(__dirname, "..", "extension"),
+    filename: "/content.js",
+    path: path.resolve(cwd(), "extension"),
   },
 };
