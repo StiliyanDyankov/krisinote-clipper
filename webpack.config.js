@@ -24,7 +24,7 @@ module.exports = {
     extensions: [".tsx", ".ts", ".js"],
   },
   output: {
-    filename: "/content.js",
+    filename: "content.js",
     path: path.resolve(cwd(), "extension"),
   },
 };
