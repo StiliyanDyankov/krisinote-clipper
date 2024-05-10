@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import LandingPage from './components/pages/LandingPage';
 import MultiselectPage from './components/pages/MultiselectPage';
 import SaveProcessPage from './components/pages/SaveProcessPage';
@@ -6,13 +6,9 @@ import SaveSuccessPage from './components/pages/SaveSuccessPage';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { IconButton } from '@mui/material';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
-import AuthPage from './components/pages/AuthPage';
 import LoadingPage from './components/pages/LoadingPage';
 
-
-
 enum PageState {
-	UNAUTHORIZED = "UNAUTHORIZED",
 	LANDING = "LANDING",
 	MUTLISELECT = "MULTISELECT",
 	SAVE_PROCESS = "SAVE_PROCESS",
@@ -73,46 +69,10 @@ const theme = createTheme({
 function App({id, onExit}: {id?: any; onExit: (request: any) => void}) {
 	
 	const [pageState, setPageState] = useState<PageState>(()=> {
-		return PageState.LOADING});
+		return PageState.LANDING});
 	
 	const handleMultiselectClick = () => {
 		setPageState(PageState.MUTLISELECT);
-	}
-
-	chrome.runtime.onMessage.addListener(messageHandler);
-	
-	useEffect(() => { 
-
-		// chrome.storage.local.remove(["token"], function() {
-		// 	console.log('Data removed');
-		// });
-
-		console.log(chrome.storage);
-
-		chrome.storage.local.get(['token'], function(result) {
-			console.log('Value currently is ' + result.token);
-			if(result.token && result.token.expiry > Date.now()) {
-				setPageState(PageState.LANDING);
-			} else {
-				setPageState(PageState.UNAUTHORIZED);
-			}
-		});
-
-		return ()=> {
-			chrome.runtime.onMessage.removeListener(messageHandler);
-		}
-	}, [])
-
-	function messageHandler(message: any) {
-		console.log("messages recieved in app", message)
-		if(message.type === "USER_AUTHENTICATED") {
-			chrome.storage.local.set({ token: { 
-				value: message.payload[0].result,
-				expiry: Date.now() + 1000 * 60 * 60 * 24
-			}}, function() {
-				setPageState(PageState.LANDING);
-			})
-		}
 	}
 
 	return (
@@ -147,7 +107,7 @@ function App({id, onExit}: {id?: any; onExit: (request: any) => void}) {
 						}}
 						>
 						<div>
-							{ pageState === PageState.UNAUTHORIZED || pageState === PageState.LOADING ? null : 
+							{ pageState === PageState.LOADING ? null : 
 								<h1
 									style={{
 										fontWeight: "500",
@@ -158,18 +118,7 @@ function App({id, onExit}: {id?: any; onExit: (request: any) => void}) {
 									{ document.head.getElementsByTagName("title").item(0)?.innerText }
 								</h1>
 							}
-							{ pageState === PageState.UNAUTHORIZED ? 
-								<h1
-									style={{
-										fontWeight: "500",
-										fontSize: "32px"
-									}}
-								>
-									<a href="https://www.krisinote.com/">KN</a>
-									
-								</h1>
-								: null
-							}
+							
 						</div>
 
 						<IconButton 
@@ -191,9 +140,6 @@ function App({id, onExit}: {id?: any; onExit: (request: any) => void}) {
 					</div>
 					{
 						pageState === PageState.LOADING ? <LoadingPage/> : null 
-					}
-					{
-						pageState === PageState.UNAUTHORIZED ? <AuthPage/> : null 
 					}
 					{
 						pageState === PageState.LANDING ? 
