@@ -3,7 +3,7 @@ const SaveSuccessPage = () => {
     <>
       <h1>save success page</h1>
     </>
-  );
-};
+  )
+}
 
-export default SaveSuccessPage;
+export default SaveSuccessPage

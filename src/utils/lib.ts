@@ -13,98 +13,98 @@ import {
   ButtonStyles,
   MinusIconStyles,
   MinusLineStyles,
-  TopElementStyles,
-} from "./constants";
+  TopElementStyles
+} from "./constants"
 
-export {};
+export {}
 
 export const removeWrappers = (): void => {
-  const selectionContainer = document.getElementById(SelectionContainerId);
+  const selectionContainer = document.getElementById(SelectionContainerId)
   if (selectionContainer) {
     selectionContainer.childNodes.forEach((wrapper) => {
-      selectionContainer.removeChild(wrapper);
-    });
+      selectionContainer.removeChild(wrapper)
+    })
   }
-};
+}
 
 export const isElementViable = (element: HTMLElement): boolean => {
   return (
     window.getComputedStyle(element).getPropertyValue("display") !== "inline" &&
     !UnviableElements.includes(element.nodeName) &&
     element.id !== SelectionContainerId
-  );
-};
+  )
+}
 
 export const getViableParent = (element: HTMLElement): HTMLElement => {
   if (isElementViable(element)) {
-    return element;
-  } else return getViableParent(element.parentElement as HTMLElement);
-};
+    return element
+  } else return getViableParent(element.parentElement as HTMLElement)
+}
 
 export const createSelectionContainer = (): HTMLElement => {
-  const selectionContainer = document.createElement("div");
-  selectionContainer.id = SelectionContainerId;
-  document.body.appendChild(selectionContainer);
-  return selectionContainer;
-};
+  const selectionContainer = document.createElement("div")
+  selectionContainer.id = SelectionContainerId
+  document.body.appendChild(selectionContainer)
+  return selectionContainer
+}
 
 export const removeSelectionContainer = (): void => {
-  const container = document.getElementById(SelectionContainerId);
+  const container = document.getElementById(SelectionContainerId)
   if (container) {
-    document.body.removeChild(container);
+    document.body.removeChild(container)
   }
-};
+}
 
-const applyStyles = (
+export const applyStyles = (
   element: HTMLDivElement,
-  styles: StyleDeclaration,
+  styles: StyleDeclaration
 ): void => {
   Object.keys(styles).forEach((key) => {
-    element.style[key as any] = styles[key];
-  });
-};
+    element.style[key as any] = styles[key]
+  })
+}
 
 export const createNewWrapper = (
   outlinedElement: HTMLElement,
   selectionContainer: HTMLElement,
   type: WrapperTypes,
-  id: number | null = null,
+  id: number | null = null
 ): HTMLElement => {
-  const hoverWrapper = document.createElement("div");
+  const hoverWrapper = document.createElement("div")
 
-  hoverWrapper.id = `krisinote-clipper-${type}-wrapper${id ? "-" + id : ""}`;
+  hoverWrapper.id = `krisinote-clipper-${type}-wrapper${id ? "-" + id : ""}`
 
-  applyStyles(hoverWrapper, HoverWrapperStyles);
+  applyStyles(hoverWrapper, HoverWrapperStyles)
 
   if (!id) {
-    hoverWrapper.style.pointerEvents = "none";
+    hoverWrapper.style.pointerEvents = "none"
   } else {
-    hoverWrapper.style.pointerEvents = "all";
+    hoverWrapper.style.pointerEvents = "all"
   }
 
-  hoverWrapper.style.height = window.getComputedStyle(outlinedElement).height;
-  hoverWrapper.style.width = window.getComputedStyle(outlinedElement).width;
-  hoverWrapper.style.top = `${outlinedElement.getBoundingClientRect().top + window.scrollY}px`;
-  hoverWrapper.style.left = `${outlinedElement.getBoundingClientRect().left + window.scrollX}px`;
+  hoverWrapper.style.height = window.getComputedStyle(outlinedElement).height
+  hoverWrapper.style.width = window.getComputedStyle(outlinedElement).width
+  hoverWrapper.style.top = `${outlinedElement.getBoundingClientRect().top + window.scrollY}px`
+  hoverWrapper.style.left = `${outlinedElement.getBoundingClientRect().left + window.scrollX}px`
 
-  selectionContainer.appendChild(hoverWrapper);
+  selectionContainer.appendChild(hoverWrapper)
 
-  return hoverWrapper;
-};
+  return hoverWrapper
+}
 
 export const removeHoverWrapper = (selectionContainer: HTMLElement): void => {
   const hoverWrapper = document.getElementById(
-    "krisinote-clipper-hover-wrapper",
-  );
+    "krisinote-clipper-hover-wrapper"
+  )
   if (hoverWrapper) {
-    selectionContainer.removeChild(hoverWrapper as Node);
+    selectionContainer.removeChild(hoverWrapper as Node)
   }
-};
+}
 
 export const findAndAnnihilateChildren = (
   selectedElements: Map<number, HTMLElement>,
   selectedElementsDepth: Map<number, number>,
-  possibleParent: { element: HTMLElement; depth: number },
+  possibleParent: { element: HTMLElement; depth: number }
 ): Map<number, HTMLElement> => {
   selectedElementsDepth.forEach((value, key) => {
     if (possibleParent.depth < value) {
@@ -112,264 +112,263 @@ export const findAndAnnihilateChildren = (
         isNthParent(
           possibleParent.element,
           selectedElements.get(key) as HTMLElement,
-          value - possibleParent.depth,
+          value - possibleParent.depth
         )
       ) {
-        annihilateChild(key);
-        selectedElements.delete(key);
-        selectedElementsDepth.delete(key);
+        annihilateChild(key)
+        selectedElements.delete(key)
+        selectedElementsDepth.delete(key)
       }
     }
-  });
-  return selectedElements;
-};
+  })
+  return selectedElements
+}
 
 export const annihilateChild = (keyOfChild: number): void => {
   const childWrapper = document.getElementById(
-    `krisinote-clipper-selection-wrapper-${keyOfChild}`,
-  );
-  const selectionContainer = document.getElementById(SelectionContainerId);
+    `krisinote-clipper-selection-wrapper-${keyOfChild}`
+  )
+  const selectionContainer = document.getElementById(SelectionContainerId)
 
-  (selectionContainer as HTMLElement).removeChild(childWrapper as Node);
-};
+  ;(selectionContainer as HTMLElement).removeChild(childWrapper as Node)
+}
 
 export const isNthParent = (
   possibleParent: HTMLElement,
   childElement: HTMLElement,
-  deltaDepth: number,
+  deltaDepth: number
 ) => {
-  let childPlaceholder = childElement;
+  let childPlaceholder = childElement
   for (let i = 0; i < deltaDepth; i++) {
-    childPlaceholder = childPlaceholder.parentElement as HTMLElement;
+    childPlaceholder = childPlaceholder.parentElement as HTMLElement
   }
-  return childPlaceholder === possibleParent;
-};
+  return childPlaceholder === possibleParent
+}
 
 export const getElementDepth = (
   element: HTMLElement,
-  counter: number = 0,
+  counter: number = 0
 ): number => {
-  if (element.nodeName === "BODY") return counter;
-  else
-    return getElementDepth(element.parentElement as HTMLElement, counter + 1);
-};
+  if (element.nodeName === "BODY") return counter
+  else return getElementDepth(element.parentElement as HTMLElement, counter + 1)
+}
 
 export const parseDomTree = async (
   el: HTMLElement | Map<Number, HTMLElement>,
-  multiselect: boolean = false,
+  multiselect: boolean = false
 ) => {
-  const testBox = document.createElement("div");
-  applyStyles(testBox, TestBoxStyles);
-  document.body.appendChild(testBox);
+  const testBox = document.createElement("div")
+  applyStyles(testBox, TestBoxStyles)
+  document.body.appendChild(testBox)
 
   if (multiselect) {
-    (el as Map<Number, HTMLElement>).forEach((el) => {
-      const cloned = krisinoteDOMParser(el as HTMLElement);
+    ;(el as Map<Number, HTMLElement>).forEach((el) => {
+      const cloned = krisinoteDOMParser(el as HTMLElement)
 
-      const xmls = new XMLSerializer();
-      const stringified = xmls.serializeToString(cloned);
+      const xmls = new XMLSerializer()
+      const stringified = xmls.serializeToString(cloned)
 
       // just for testing purposes
 
-      testBox.insertAdjacentHTML("afterbegin", xmls.serializeToString(cloned));
-      const link = document.querySelectorAll("head link");
+      testBox.insertAdjacentHTML("afterbegin", xmls.serializeToString(cloned))
+      const link = document.querySelectorAll("head link")
 
       console.log(
         performance
           .getEntries()
           .map((entry) => {
-            return entry.name;
+            return entry.name
           })
           .filter((url) => {
-            return url.includes(".woff") || url.includes("font");
-          }),
-      );
+            return url.includes(".woff") || url.includes("font")
+          })
+      )
 
       const fontArr = performance
         .getEntries()
         .map((entry) => {
-          return entry.name;
+          return entry.name
         })
         .filter((url) => {
-          return url.includes(".woff") || url.includes("font");
-        });
+          return url.includes(".woff") || url.includes("font")
+        })
 
-      console.log("font array", fontArr);
+      console.log("font array", fontArr)
 
       const result = fontArr.map(
-        (font) => `<link href="${font}" type="text/css" rel="stylesheet"/>`,
-      );
+        (font) => `<link href="${font}" type="text/css" rel="stylesheet"/>`
+      )
 
-      console.log("final result", result);
+      console.log("final result", result)
 
-      const finalRes = result.join("") + stringified;
-      console.log(finalRes);
-    });
+      const finalRes = result.join("") + stringified
+      console.log(finalRes)
+    })
   } else {
-    const cloned = krisinoteDOMParser(el as HTMLElement);
+    const cloned = krisinoteDOMParser(el as HTMLElement)
 
-    const xmls = new XMLSerializer();
-    const stringified = xmls.serializeToString(cloned);
+    const xmls = new XMLSerializer()
+    const stringified = xmls.serializeToString(cloned)
 
     // just for testing purposes
 
-    testBox.insertAdjacentHTML("afterbegin", xmls.serializeToString(cloned));
-    const link = document.querySelectorAll("head link");
+    testBox.insertAdjacentHTML("afterbegin", xmls.serializeToString(cloned))
+    const link = document.querySelectorAll("head link")
 
     console.log(
       performance
         .getEntries()
         .map((entry) => {
-          return entry.name;
+          return entry.name
         })
         .filter((url) => {
-          return url.includes(".woff") || url.includes("font");
-        }),
-    );
+          return url.includes(".woff") || url.includes("font")
+        })
+    )
 
     const fontArr = performance
       .getEntries()
       .map((entry) => {
-        return entry.name;
+        return entry.name
       })
       .filter((url) => {
-        return url.includes(".woff") || url.includes("font");
-      });
+        return url.includes(".woff") || url.includes("font")
+      })
 
-    console.log("font array", fontArr);
+    console.log("font array", fontArr)
 
     const result = fontArr.map(
-      (font) => `<link href="${font}" type="text/css" rel="stylesheet"/>`,
-    );
+      (font) => `<link href="${font}" type="text/css" rel="stylesheet"/>`
+    )
 
-    console.log("final result", result);
+    console.log("final result", result)
 
-    const finalRes = result.join("") + stringified;
-    console.log(finalRes);
+    const finalRes = result.join("") + stringified
+    console.log(finalRes)
   }
 
   // testBox.appendChild(cloned);
 
   // try to get all link elements
-};
+}
 
 export enum SelectType {
   ARTICLE = "ARTICLE",
   FULL_PAGE = "FULL_PAGE",
-  SIMPLIFIED_ARTICLE = "SIMPLIFIED_ARTICLE",
+  SIMPLIFIED_ARTICLE = "SIMPLIFIED_ARTICLE"
 }
 
 export const getArticleSelectionEl = (): HTMLElement => {
   let docToBeReturned = document.querySelector(
-    "main article",
-  ) as HTMLElement | null;
+    "main article"
+  ) as HTMLElement | null
   if (!docToBeReturned) {
-    docToBeReturned = document.querySelector("article") as HTMLElement | null;
+    docToBeReturned = document.querySelector("article") as HTMLElement | null
   }
   if (!docToBeReturned) {
-    docToBeReturned = document.querySelector("body") as HTMLElement;
+    docToBeReturned = document.querySelector("body") as HTMLElement
   }
-  return docToBeReturned;
-};
+  return docToBeReturned
+}
 
 export const putButtons = (id: number): void => {
   const selectionWrapper = document.getElementById(
-    `krisinote-clipper-selection-wrapper-${id}`,
-  ) as HTMLElement;
+    `krisinote-clipper-selection-wrapper-${id}`
+  ) as HTMLElement
 
-  selectionWrapper.style.position = "absolute";
+  selectionWrapper.style.position = "absolute"
 
-  const plusIcon = document.createElement("div");
-  applyStyles(plusIcon, PlusIconStyles);
-  const plusLineHorizontal = document.createElement("div");
-  applyStyles(plusLineHorizontal, PlusLineHorizontalStyles);
-  const plusLineVertical = document.createElement("div");
-  applyStyles(plusLineVertical, PlusLineVerticalStyles);
-  plusIcon.appendChild(plusLineHorizontal);
-  plusIcon.appendChild(plusLineVertical);
+  const plusIcon = document.createElement("div")
+  applyStyles(plusIcon, PlusIconStyles)
+  const plusLineHorizontal = document.createElement("div")
+  applyStyles(plusLineHorizontal, PlusLineHorizontalStyles)
+  const plusLineVertical = document.createElement("div")
+  applyStyles(plusLineVertical, PlusLineVerticalStyles)
+  plusIcon.appendChild(plusLineHorizontal)
+  plusIcon.appendChild(plusLineVertical)
 
-  const plusButton = document.createElement("div");
-  plusButton.id = ContainerPlusButtonId;
-  applyStyles(plusButton, ButtonStyles);
+  const plusButton = document.createElement("div")
+  plusButton.id = ContainerPlusButtonId
+  applyStyles(plusButton, ButtonStyles)
 
-  plusButton.appendChild(plusIcon);
+  plusButton.appendChild(plusIcon)
 
-  const minusIcon = document.createElement("div");
-  applyStyles(minusIcon, MinusIconStyles);
-  const minusLine = document.createElement("div");
-  applyStyles(minusLine, MinusLineStyles);
-  minusIcon.appendChild(minusLine);
+  const minusIcon = document.createElement("div")
+  applyStyles(minusIcon, MinusIconStyles)
+  const minusLine = document.createElement("div")
+  applyStyles(minusLine, MinusLineStyles)
+  minusIcon.appendChild(minusLine)
 
-  const minusButton = document.createElement("div");
-  minusButton.id = ContainerMinusButtonId;
-  applyStyles(minusButton, ButtonStyles);
-  minusButton.appendChild(minusIcon);
+  const minusButton = document.createElement("div")
+  minusButton.id = ContainerMinusButtonId
+  applyStyles(minusButton, ButtonStyles)
+  minusButton.appendChild(minusIcon)
 
-  const topElement = document.createElement("div");
-  applyStyles(topElement, TopElementStyles);
+  const topElement = document.createElement("div")
+  applyStyles(topElement, TopElementStyles)
 
-  topElement.appendChild(plusButton);
-  topElement.appendChild(minusButton);
+  topElement.appendChild(plusButton)
+  topElement.appendChild(minusButton)
 
-  selectionWrapper.appendChild(topElement);
-};
+  selectionWrapper.appendChild(topElement)
+}
 
 export const createNewSpecialWrapper = (
   outlinedElement: HTMLElement,
   selectionContainer: HTMLElement,
   id: number,
   eventHandlers: {
-    handlePlusButtonClick: () => void;
-    handleMinusButtonClick: () => void;
-  },
+    handlePlusButtonClick: () => void
+    handleMinusButtonClick: () => void
+  }
 ) => {
   // get current wrapper
   const currentSelectedElementWrapper =
-    selectionContainer?.firstElementChild as HTMLElement;
+    selectionContainer?.firstElementChild as HTMLElement
 
   if (currentSelectedElementWrapper) {
     document
       .getElementById(ContainerPlusButtonId)
-      ?.removeEventListener("click", eventHandlers.handlePlusButtonClick);
+      ?.removeEventListener("click", eventHandlers.handlePlusButtonClick)
     document
       .getElementById(ContainerMinusButtonId)
-      ?.removeEventListener("click", eventHandlers.handleMinusButtonClick);
+      ?.removeEventListener("click", eventHandlers.handleMinusButtonClick)
     document
       .getElementById(SelectionContainerId)
-      ?.removeChild(currentSelectedElementWrapper);
+      ?.removeChild(currentSelectedElementWrapper)
   }
 
   createNewWrapper(
     outlinedElement,
     selectionContainer as HTMLElement,
     WrapperTypes.selection,
-    id,
-  );
-  putButtons(id);
+    id
+  )
+  putButtons(id)
   document
     .getElementById(ContainerPlusButtonId)
-    ?.addEventListener("click", eventHandlers.handlePlusButtonClick);
+    ?.addEventListener("click", eventHandlers.handlePlusButtonClick)
   document
     .getElementById(ContainerMinusButtonId)
-    ?.addEventListener("click", eventHandlers.handleMinusButtonClick);
-};
+    ?.addEventListener("click", eventHandlers.handleMinusButtonClick)
+}
 
 // here happens the magic
 
 export const krisinoteDOMParser = (entryElement: HTMLElement) => {
-  const entryElementClone = entryElement.cloneNode(true) as HTMLElement;
+  const entryElementClone = entryElement.cloneNode(true) as HTMLElement
 
-  entryElementClone.style.all = "initial";
+  entryElementClone.style.all = "initial"
 
   entryElementClone.style.backgroundColor =
-    getInheritedBackgroundColor(entryElement);
-  entryElementClone.style.fontFamily = getInheritedFontFamily(entryElement);
-  entryElementClone.style.fontSize = getInheritedFontSize(entryElement);
+    getInheritedBackgroundColor(entryElement)
+  entryElementClone.style.fontFamily = getInheritedFontFamily(entryElement)
+  entryElementClone.style.fontSize = getInheritedFontSize(entryElement)
 
-  parseDOMNode(entryElement, entryElementClone);
+  parseDOMNode(entryElement, entryElementClone)
 
-  return entryElementClone;
-};
+  return entryElementClone
+}
 
 const defaultStylesToBeCoppied = [
   "color",
@@ -473,8 +472,8 @@ const defaultStylesToBeCoppied = [
 
   "list-style-image",
   "list-style-position",
-  "list-style-type",
-];
+  "list-style-type"
+]
 
 const sizingStylesToBeCoppied = [
   "padding-right",
@@ -483,13 +482,13 @@ const sizingStylesToBeCoppied = [
   "margin-right",
   "margin-left",
 
-  "gap",
-];
+  "gap"
+]
 
-const INSERTION_VIEWPORT_WIDTH = 1000;
+const INSERTION_VIEWPORT_WIDTH = 1000
 
 const parseGridTemplateColumns = (original: string): string => {
-  const split = original.split(" ");
+  const split = original.split(" ")
 
   split.forEach((val, i) => {
     if (val.includes("px")) {
@@ -497,19 +496,19 @@ const parseGridTemplateColumns = (original: string): string => {
         window
           .getComputedStyle(document.body)
           .getPropertyValue("width")
-          .slice(0, -2),
-      );
-      let pxVal = parseInt(val.slice(0, -2));
-      split[i] = `${Math.floor((pxVal / viewPortWidth) * 100)}%`;
+          .slice(0, -2)
+      )
+      let pxVal = parseInt(val.slice(0, -2))
+      split[i] = `${Math.floor((pxVal / viewPortWidth) * 100)}%`
     }
-  });
+  })
 
-  return split.join(" ");
-};
+  return split.join(" ")
+}
 
 const parseDOMNode = (
   realElement: HTMLElement | null,
-  clonedElement: HTMLElement | null,
+  clonedElement: HTMLElement | null
 ) => {
   if (
     realElement?.nodeType === Node.ELEMENT_NODE &&
@@ -518,38 +517,38 @@ const parseDOMNode = (
       .getPropertyValue("visibility") !== "hidden"
   ) {
     // we have as a given here that the elements ARE actual html elements
-    clonedElement = clonedElement as HTMLElement;
+    clonedElement = clonedElement as HTMLElement
 
     // remove id
     if (realElement?.id) {
-      clonedElement?.removeAttribute("id");
+      clonedElement?.removeAttribute("id")
     }
 
     // remove class
     if (realElement?.className) {
-      clonedElement?.removeAttribute("class");
+      clonedElement?.removeAttribute("class")
     }
 
     // here happens cloning of classes
 
-    let styleAttributes = "";
+    let styleAttributes = ""
 
     defaultStylesToBeCoppied.forEach((value) => {
       styleAttributes = appendStyle(
         styleAttributes,
         value,
-        window.getComputedStyle(realElement as Element).getPropertyValue(value),
-      );
-      clonedElement?.setAttribute("style", styleAttributes);
-    });
+        window.getComputedStyle(realElement as Element).getPropertyValue(value)
+      )
+      clonedElement?.setAttribute("style", styleAttributes)
+    })
 
     // gets the value of a given size prop as a number in px
     let viewPortWidth = parseInt(
       window
         .getComputedStyle(document.body)
         .getPropertyValue("width")
-        .slice(0, -2),
-    );
+        .slice(0, -2)
+    )
 
     // gets the calculated size of an x-axis margin/padding and sets it as a fraction of vw
     sizingStylesToBeCoppied.forEach((value) => {
@@ -558,15 +557,15 @@ const parseDOMNode = (
         window
           .getComputedStyle(realElement as Element)
           .getPropertyValue(value)
-          .slice(0, -2),
-      );
+          .slice(0, -2)
+      )
       styleAttributes = appendStyle(
         styleAttributes,
         value,
-        `${Math.floor((sizingOfElementPx / viewPortWidth) * INSERTION_VIEWPORT_WIDTH)}px`,
-      );
-      clonedElement?.setAttribute("style", styleAttributes);
-    });
+        `${Math.floor((sizingOfElementPx / viewPortWidth) * INSERTION_VIEWPORT_WIDTH)}px`
+      )
+      clonedElement?.setAttribute("style", styleAttributes)
+    })
 
     if (
       window
@@ -576,66 +575,66 @@ const parseDOMNode = (
       clonedElement.style.gridTemplateColumns = parseGridTemplateColumns(
         window
           .getComputedStyle(realElement)
-          .getPropertyValue("grid-template-columns"),
-      );
+          .getPropertyValue("grid-template-columns")
+      )
     }
 
     clonedElement.style.backgroundColor =
-      getInheritedBackgroundColor(realElement);
+      getInheritedBackgroundColor(realElement)
 
-    clonedElement.style.minWidth = "fit-content";
-    clonedElement.style.minHeight = "fit-content";
-    clonedElement.style.overflowX = "hidden";
+    clonedElement.style.minWidth = "fit-content"
+    clonedElement.style.minHeight = "fit-content"
+    clonedElement.style.overflowX = "hidden"
 
     if (clonedElement.nodeName === "IMG") {
-      const imgPath = (realElement as HTMLImageElement).getAttribute("src");
+      const imgPath = (realElement as HTMLImageElement).getAttribute("src")
 
       if (imgPath) {
         const isAbsoluteUrl =
-          imgPath.indexOf("://") > 0 || imgPath.indexOf("//") === 0;
+          imgPath.indexOf("://") > 0 || imgPath.indexOf("//") === 0
 
-        console.log(isAbsoluteUrl); // Output: true
+        console.log(isAbsoluteUrl) // Output: true
         if (!isAbsoluteUrl) {
-          const origin = location.origin;
+          const origin = location.origin
 
-          const newUrl = origin + imgPath;
+          const newUrl = origin + imgPath
 
-          (clonedElement as HTMLImageElement).setAttribute("src", newUrl);
+          ;(clonedElement as HTMLImageElement).setAttribute("src", newUrl)
         } else {
         }
       }
     }
-    console.log(clonedElement.nodeName);
+    console.log(clonedElement.nodeName)
     if (clonedElement.nodeName === "A") {
-      const imgPath = (realElement as HTMLImageElement).getAttribute("href");
+      const imgPath = (realElement as HTMLImageElement).getAttribute("href")
 
       if (imgPath) {
         const isAbsoluteUrl =
-          imgPath.indexOf("://") > 0 || imgPath.indexOf("//") === 0;
+          imgPath.indexOf("://") > 0 || imgPath.indexOf("//") === 0
 
         if (!isAbsoluteUrl) {
-          const origin = location.origin;
+          const origin = location.origin
 
-          const newUrl = origin + imgPath;
+          const newUrl = origin + imgPath
 
-          (clonedElement as HTMLImageElement).setAttribute("href", newUrl);
+          ;(clonedElement as HTMLImageElement).setAttribute("href", newUrl)
         } else {
         }
       }
     }
     if (clonedElement.nodeName === "SOURCE") {
-      const imgPath = (realElement as HTMLImageElement).getAttribute("srcset");
+      const imgPath = (realElement as HTMLImageElement).getAttribute("srcset")
 
       if (imgPath) {
         const isAbsoluteUrl =
-          imgPath.indexOf("://") > 0 || imgPath.indexOf("//") === 0;
+          imgPath.indexOf("://") > 0 || imgPath.indexOf("//") === 0
 
         if (!isAbsoluteUrl) {
-          const origin = location.origin;
+          const origin = location.origin
 
-          const newUrl = origin + imgPath;
+          const newUrl = origin + imgPath
 
-          (clonedElement as HTMLImageElement).setAttribute("srcset", newUrl);
+          ;(clonedElement as HTMLImageElement).setAttribute("srcset", newUrl)
         } else {
         }
       }
@@ -647,7 +646,7 @@ const parseDOMNode = (
       clonedElement.nodeName === "IMG" ||
       clonedElement.nodeName === "A"
     ) {
-      clonedElement.setAttribute("target", "_blank");
+      clonedElement.setAttribute("target", "_blank")
     }
 
     if (
@@ -657,74 +656,72 @@ const parseDOMNode = (
       clonedElement.nodeName === "path"
     ) {
       if (realElement?.getAttribute("width")) {
-        clonedElement?.removeAttribute("width");
+        clonedElement?.removeAttribute("width")
       }
       if (realElement?.getAttribute("height")) {
-        clonedElement?.removeAttribute("height");
+        clonedElement?.removeAttribute("height")
       }
       clonedElement.style.width = window
         .getComputedStyle(realElement as Element)
-        .getPropertyValue("width");
+        .getPropertyValue("width")
       clonedElement.style.height = window
         .getComputedStyle(realElement as Element)
-        .getPropertyValue("height");
+        .getPropertyValue("height")
     }
   }
 
   realElement?.childNodes.forEach((childNode, key) => {
     parseDOMNode(
       childNode as HTMLElement,
-      clonedElement?.childNodes.item(key) as HTMLElement,
-    );
-  });
-};
+      clonedElement?.childNodes.item(key) as HTMLElement
+    )
+  })
+}
 
 const appendStyle = (
   styleString: string,
   styleToBeAppended: string,
-  value: string,
+  value: string
 ) => {
-  return `${styleString}${styleToBeAppended}: ${value}; `;
-};
+  return `${styleString}${styleToBeAppended}: ${value}; `
+}
 
 function getInheritedBackgroundColor(el: HTMLElement): string {
-  var defaultStyle = "rgba(0, 0, 0, 0)";
+  var defaultStyle = "rgba(0, 0, 0, 0)"
 
-  var backgroundColor = window.getComputedStyle(el).backgroundColor;
+  var backgroundColor = window.getComputedStyle(el).backgroundColor
 
   if (backgroundColor != defaultStyle && backgroundColor != "rgba(0, 0, 0)")
-    return backgroundColor;
+    return backgroundColor
 
   if (el.parentNode)
-    return getInheritedBackgroundColor(el.parentNode as HTMLElement);
+    return getInheritedBackgroundColor(el.parentNode as HTMLElement)
 
-  return defaultStyle;
+  return defaultStyle
 }
 
 function getInheritedFontFamily(el: HTMLElement): string {
-  var defaultStyle = "Times New Roman";
+  var defaultStyle = "Times New Roman"
 
-  var fontFamily = window.getComputedStyle(el).fontFamily;
+  var fontFamily = window.getComputedStyle(el).fontFamily
 
-  if (fontFamily != defaultStyle) return fontFamily;
+  if (fontFamily != defaultStyle) return fontFamily
 
-  if (el.parentNode)
-    return getInheritedFontFamily(el.parentNode as HTMLElement);
+  if (el.parentNode) return getInheritedFontFamily(el.parentNode as HTMLElement)
 
-  return defaultStyle;
+  return defaultStyle
 }
 
 function getInheritedFontSize(el: HTMLElement): string {
-  var defaultSize = "16px";
+  var defaultSize = "16px"
 
   if (el?.nodeType === Node.ELEMENT_NODE) {
-    var fontSize = window.getComputedStyle(el).fontSize;
+    var fontSize = window.getComputedStyle(el).fontSize
 
-    if (fontSize != defaultSize) return fontSize;
+    if (fontSize != defaultSize) return fontSize
 
-    if (el.parentNode)
-      return getInheritedFontSize(el.parentNode as HTMLElement);
+    if (el.parentNode) return getInheritedFontSize(el.parentNode as HTMLElement)
   }
 
-  return defaultSize;
+  return defaultSize
 }

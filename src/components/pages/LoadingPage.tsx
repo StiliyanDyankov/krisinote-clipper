@@ -1,5 +1,5 @@
 const LoadingPage = () => {
-  return <h1>Loading Page</h1>;
-};
+  return <h1>Loading Page</h1>
+}
 
-export default LoadingPage;
+export default LoadingPage

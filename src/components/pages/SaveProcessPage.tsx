@@ -3,7 +3,7 @@ const SaveProcessPage = () => {
     <>
       <h1>save process page</h1>
     </>
-  );
-};
+  )
+}
 
-export default SaveProcessPage;
+export default SaveProcessPage

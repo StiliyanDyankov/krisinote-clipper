@@ -1,6 +1,6 @@
-export const SelectionContainerId = "krisinote-clipper-selection-container";
-export const ContainerPlusButtonId = "krisinote-clipper-article-plus-button";
-export const ContainerMinusButtonId = "krisinote-clipper-article-minus-button";
+export const SelectionContainerId = "krisinote-clipper-selection-container"
+export const ContainerPlusButtonId = "krisinote-clipper-article-plus-button"
+export const ContainerMinusButtonId = "krisinote-clipper-article-minus-button"
 
 export const UnviableElements = [
   "SPAN",
@@ -14,22 +14,22 @@ export const UnviableElements = [
   "SUP",
   "ellipse",
   "circle",
-  "g",
-];
+  "g"
+]
 
 export enum WrapperTypes {
   hover = "hover",
-  selection = "selection",
+  selection = "selection"
 }
 
 export enum MultiSelectionTypes {
   ALL = "ALL",
-  PARAGRAPH = "PARAGRAPH",
+  PARAGRAPH = "PARAGRAPH"
 }
 
 export type StyleDeclaration = {
-  [key: string]: string;
-};
+  [key: string]: string
+}
 
 // TODO: make this work in some bright future
 // export type StyleDeclaration2 = Partial<
@@ -46,8 +46,8 @@ export const PlusIconStyles: StyleDeclaration = {
   backgroundColor: "#292e4c",
   boxShadow: "0 0 0 2px #292e4c",
   position: "relative",
-  margin: "auto",
-};
+  margin: "auto"
+}
 
 export const PlusLineHorizontalStyles: StyleDeclaration = {
   width: "10px",
@@ -56,8 +56,8 @@ export const PlusLineHorizontalStyles: StyleDeclaration = {
   position: "absolute",
   top: "50%",
   left: "50%",
-  transform: "translate(-50%, -50%)",
-};
+  transform: "translate(-50%, -50%)"
+}
 
 export const PlusLineVerticalStyles: StyleDeclaration = {
   width: "2px",
@@ -66,14 +66,14 @@ export const PlusLineVerticalStyles: StyleDeclaration = {
   position: "absolute",
   top: "50%",
   left: "50%",
-  transform: "translate(-50%, -50%)",
-};
+  transform: "translate(-50%, -50%)"
+}
 
 export const ButtonStyles: StyleDeclaration = {
   width: "27px",
   height: "24px",
-  cursor: "pointer",
-};
+  cursor: "pointer"
+}
 
 export const MinusIconStyles: StyleDeclaration = {
   width: "20px",
@@ -82,8 +82,8 @@ export const MinusIconStyles: StyleDeclaration = {
   backgroundColor: "#292e4c",
   boxShadow: "0 0 0 2px #292e4c",
   position: "relative",
-  margin: "auto",
-};
+  margin: "auto"
+}
 
 export const MinusLineStyles: StyleDeclaration = {
   width: "10px",
@@ -92,8 +92,8 @@ export const MinusLineStyles: StyleDeclaration = {
   position: "absolute",
   top: "50%",
   left: "50%",
-  transform: "translate(-50%, -50%)",
-};
+  transform: "translate(-50%, -50%)"
+}
 
 export const TopElementStyles: StyleDeclaration = {
   position: "absolute",
@@ -103,15 +103,15 @@ export const TopElementStyles: StyleDeclaration = {
   height: "24px",
   display: "flex",
   flexDirection: "row",
-  pointerEvents: "all",
-};
+  pointerEvents: "all"
+}
 
 export const HoverWrapperStyles: StyleDeclaration = {
   border: "3px solid #8c93c0",
   backgroundColor: "rgba(0,0,0,0.3)",
   position: "absolute",
-  zIndex: "99998",
-};
+  zIndex: "99998"
+}
 
 export const TestBoxStyles: StyleDeclaration = {
   position: "fixed",
@@ -123,5 +123,14 @@ export const TestBoxStyles: StyleDeclaration = {
   overflowY: "scroll",
   overflowX: "scroll",
   zIndex: "99999",
-  backgroundColor: "#ffffff",
-};
+  backgroundColor: "#ffffff"
+}
+
+export const RootElementStyles: StyleDeclaration = {
+  position: "fixed",
+  right: "12px",
+  top: "12px",
+  width: "300px",
+  height: "auto",
+  zIndex: "99999"
+}

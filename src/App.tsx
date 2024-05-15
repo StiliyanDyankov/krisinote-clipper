@@ -1,19 +1,19 @@
-import { useState } from "react";
-import LandingPage from "./components/pages/LandingPage";
-import MultiselectPage from "./components/pages/MultiselectPage";
-import SaveProcessPage from "./components/pages/SaveProcessPage";
-import SaveSuccessPage from "./components/pages/SaveSuccessPage";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { IconButton } from "@mui/material";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import LoadingPage from "./components/pages/LoadingPage";
+import { useState } from "react"
+import LandingPage from "./components/pages/LandingPage"
+import MultiselectPage from "./components/pages/MultiselectPage"
+import SaveProcessPage from "./components/pages/SaveProcessPage"
+import SaveSuccessPage from "./components/pages/SaveSuccessPage"
+import { ThemeProvider, createTheme } from "@mui/material/styles"
+import { IconButton } from "@mui/material"
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
+import LoadingPage from "./components/pages/LoadingPage"
 
 enum PageState {
   LANDING = "LANDING",
   MUTLISELECT = "MULTISELECT",
   SAVE_PROCESS = "SAVE_PROCESS",
   SAVE_SUCCESS = "SAVE_SUCCESS",
-  LOADING = "LOADING",
+  LOADING = "LOADING"
 }
 
 export const colorsTailwind = {
@@ -30,48 +30,48 @@ export const colorsTailwind = {
   "d-400-sibebar": "#525c98",
   "d-500-divider": "#666fac",
   "d-600-lightest": "#8c93c0",
-  "d-700-text": "#bfc3dc",
-};
+  "d-700-text": "#bfc3dc"
+}
 
 const theme = createTheme({
   palette: {
     primary: {
       main: colorsTailwind["d-600-lightest"],
-      contrastText: "#fff",
+      contrastText: "#fff"
     },
     background: {
-      default: colorsTailwind["d-500-divider"],
+      default: colorsTailwind["d-500-divider"]
     },
     secondary: {
-      main: "#fff",
+      main: "#fff"
     },
     text: {
-      primary: "#ffffff",
-    },
+      primary: "#ffffff"
+    }
   },
   typography: {
     fontSize: 16,
-    fontFamily: "Quicksand,Roboto,sans-serif,Segoe UI,Arial",
+    fontFamily: "Quicksand,Roboto,sans-serif,Segoe UI,Arial"
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          textAlign: "left",
-        },
-      },
-    },
-  },
-});
+          textAlign: "left"
+        }
+      }
+    }
+  }
+})
 
 function App({ id, onExit }: { id?: any; onExit: (request: any) => void }) {
   const [pageState, setPageState] = useState<PageState>(() => {
-    return PageState.LANDING;
-  });
+    return PageState.LANDING
+  })
 
   const handleMultiselectClick = () => {
-    setPageState(PageState.MUTLISELECT);
-  };
+    setPageState(PageState.MUTLISELECT)
+  }
 
   return (
     <>
@@ -90,7 +90,7 @@ function App({ id, onExit }: { id?: any; onExit: (request: any) => void }) {
               padding: "10px",
               backgroundColor: colorsTailwind["d-100-body-bg"],
               border: `2px solid ${colorsTailwind["d-300-chips"]}`,
-              fontSize: "16px",
+              fontSize: "16px"
             }}
           >
             <div
@@ -100,7 +100,7 @@ function App({ id, onExit }: { id?: any; onExit: (request: any) => void }) {
                 justifyContent: "space-between",
                 alignItems: "center",
                 fontSize: "16px",
-                marginBottom: "5px",
+                marginBottom: "5px"
               }}
             >
               <div>
@@ -109,7 +109,7 @@ function App({ id, onExit }: { id?: any; onExit: (request: any) => void }) {
                     style={{
                       fontWeight: "500",
                       fontStyle: "italic",
-                      fontSize: "16px",
+                      fontSize: "16px"
                     }}
                   >
                     {
@@ -122,17 +122,17 @@ function App({ id, onExit }: { id?: any; onExit: (request: any) => void }) {
 
               <IconButton
                 onClick={() => {
-                  onExit({ type: "LIFECYCLE_STATUS" });
+                  onExit({ type: "LIFECYCLE_STATUS" })
                 }}
                 sx={{
                   ":hover": {
-                    backgroundColor: "rgba(255,255,255,0.05)",
-                  },
+                    backgroundColor: "rgba(255,255,255,0.05)"
+                  }
                 }}
               >
                 <CloseRoundedIcon
                   style={{
-                    fill: "#fff",
+                    fill: "#fff"
                   }}
                 />
               </IconButton>
@@ -148,7 +148,7 @@ function App({ id, onExit }: { id?: any; onExit: (request: any) => void }) {
         </ThemeProvider>
       </div>
     </>
-  );
+  )
 }
 
-export default App;
+export default App
