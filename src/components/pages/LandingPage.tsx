@@ -26,7 +26,6 @@ import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
 import { colorsTailwind } from "../../App";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 
-let counter = 1;
 const LandingPage = ({
   onMultiSelectClick,
 }: {
