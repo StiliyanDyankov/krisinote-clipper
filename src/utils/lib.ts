@@ -1,34 +1,25 @@
+import {
+  ContainerMinusButtonId,
+  ContainerPlusButtonId,
+  SelectionContainerId,
+  WrapperTypes,
+  UnviableElements,
+  StyleDeclaration,
+  HoverWrapperStyles,
+  TestBoxStyles,
+  PlusIconStyles,
+  PlusLineHorizontalStyles,
+  PlusLineVerticalStyles,
+  ButtonStyles,
+  MinusIconStyles,
+  MinusLineStyles,
+  TopElementStyles,
+} from "./constants";
+
 export {};
 
-export const unviableElements = [
-  "SPAN",
-  "A",
-  "I",
-  "IFRAME",
-  "B",
-  "svg",
-  "PATH",
-  "HR",
-  "SUP",
-  "ellipse",
-  "circle",
-  "g",
-];
-
-export enum WrapperTypes {
-  hover = "hover",
-  selection = "selection",
-}
-
-export enum MultiSelectionTypes {
-  ALL = "ALL",
-  PARAGRAPH = "PARAGRAPH",
-}
-
 export const removeWrappers = (): void => {
-  const selectionContainer = document.getElementById(
-    "krisinote-clipper-selection-container",
-  );
+  const selectionContainer = document.getElementById(SelectionContainerId);
   if (selectionContainer) {
     selectionContainer.childNodes.forEach((wrapper) => {
       selectionContainer.removeChild(wrapper);
@@ -39,8 +30,8 @@ export const removeWrappers = (): void => {
 export const isElementViable = (element: HTMLElement): boolean => {
   return (
     window.getComputedStyle(element).getPropertyValue("display") !== "inline" &&
-    !unviableElements.includes(element.nodeName) &&
-    element.id !== "krisinote-clipper-selection-container"
+    !UnviableElements.includes(element.nodeName) &&
+    element.id !== SelectionContainerId
   );
 };
 
@@ -52,18 +43,25 @@ export const getViableParent = (element: HTMLElement): HTMLElement => {
 
 export const createSelectionContainer = (): HTMLElement => {
   const selectionContainer = document.createElement("div");
-  selectionContainer.id = "krisinote-clipper-selection-container";
+  selectionContainer.id = SelectionContainerId;
   document.body.appendChild(selectionContainer);
   return selectionContainer;
 };
 
 export const removeSelectionContainer = (): void => {
-  const container = document.getElementById(
-    "krisinote-clipper-selection-container",
-  );
+  const container = document.getElementById(SelectionContainerId);
   if (container) {
     document.body.removeChild(container);
   }
+};
+
+const applyStyles = (
+  element: HTMLDivElement,
+  styles: StyleDeclaration,
+): void => {
+  Object.keys(styles).forEach((key) => {
+    element.style[key as any] = styles[key];
+  });
 };
 
 export const createNewWrapper = (
@@ -76,10 +74,8 @@ export const createNewWrapper = (
 
   hoverWrapper.id = `krisinote-clipper-${type}-wrapper${id ? "-" + id : ""}`;
 
-  hoverWrapper.style.border = "3px solid #8c93c0";
-  hoverWrapper.style.backgroundColor = "rgba(0,0,0,0.3)";
-  hoverWrapper.style.position = "absolute";
-  hoverWrapper.style.zIndex = "99998";
+  applyStyles(hoverWrapper, HoverWrapperStyles);
+
   if (!id) {
     hoverWrapper.style.pointerEvents = "none";
   } else {
@@ -132,9 +128,7 @@ export const annihilateChild = (keyOfChild: number): void => {
   const childWrapper = document.getElementById(
     `krisinote-clipper-selection-wrapper-${keyOfChild}`,
   );
-  const selectionContainer = document.getElementById(
-    "krisinote-clipper-selection-container",
-  );
+  const selectionContainer = document.getElementById(SelectionContainerId);
 
   (selectionContainer as HTMLElement).removeChild(childWrapper as Node);
 };
@@ -165,16 +159,7 @@ export const parseDomTree = async (
   multiselect: boolean = false,
 ) => {
   const testBox = document.createElement("div");
-  testBox.style.position = "fixed";
-  testBox.style.left = "12px";
-  testBox.style.top = "12px";
-  testBox.style.padding = "5px";
-  testBox.style.width = "1200px";
-  testBox.style.height = "900px";
-  testBox.style.overflowY = "scroll";
-  testBox.style.overflowX = "scroll";
-  testBox.style.zIndex = "99999";
-  testBox.style.backgroundColor = "#ffffff";
+  applyStyles(testBox, TestBoxStyles);
   document.body.appendChild(testBox);
 
   if (multiselect) {
@@ -294,76 +279,34 @@ export const putButtons = (id: number): void => {
 
   selectionWrapper.style.position = "absolute";
 
-  let plusIcon = document.createElement("div");
-  plusIcon.style.width = "20px";
-  plusIcon.style.height = "20px";
-  plusIcon.style.borderRadius = "2px 0 0 2px";
-  plusIcon.style.backgroundColor = "#292e4c";
-  plusIcon.style.boxShadow = "0 0 0 2px #292e4c";
-  plusIcon.style.position = "relative";
-  plusIcon.style.margin = "auto";
-  let plusLine1 = document.createElement("div");
-  plusLine1.style.width = "10px";
-  plusLine1.style.height = "2px";
-  plusLine1.style.backgroundColor = "white";
-  plusLine1.style.position = "absolute";
-  plusLine1.style.top = "50%";
-  plusLine1.style.left = "50%";
-  plusLine1.style.transform = "translate(-50%, -50%)";
-  let plusLine2 = document.createElement("div");
-  plusLine2.style.width = "2px";
-  plusLine2.style.height = "10px";
-  plusLine2.style.backgroundColor = "white";
-  plusLine2.style.position = "absolute";
-  plusLine2.style.top = "50%";
-  plusLine2.style.left = "50%";
-  plusLine2.style.transform = "translate(-50%, -50%)";
-  plusIcon.appendChild(plusLine1);
-  plusIcon.appendChild(plusLine2);
+  const plusIcon = document.createElement("div");
+  applyStyles(plusIcon, PlusIconStyles);
+  const plusLineHorizontal = document.createElement("div");
+  applyStyles(plusLineHorizontal, PlusLineHorizontalStyles);
+  const plusLineVertical = document.createElement("div");
+  applyStyles(plusLineVertical, PlusLineVerticalStyles);
+  plusIcon.appendChild(plusLineHorizontal);
+  plusIcon.appendChild(plusLineVertical);
 
-  let plusButton = document.createElement("div");
-  plusButton.id = "krisinote-clipper-article-plus-button";
-  plusButton.style.width = "27px";
-  plusButton.style.height = "24px";
-  plusButton.style.cursor = "pointer";
+  const plusButton = document.createElement("div");
+  plusButton.id = ContainerPlusButtonId;
+  applyStyles(plusButton, ButtonStyles);
 
   plusButton.appendChild(plusIcon);
 
-  let minusIcon = document.createElement("div");
-  minusIcon.style.width = "20px";
-  minusIcon.style.height = "20px";
-  minusIcon.style.borderRadius = "0 2px 2px 0";
-  minusIcon.style.backgroundColor = "#292e4c";
-  minusIcon.style.boxShadow = "0 0 0 2px #292e4c";
-  minusIcon.style.position = "relative";
-  minusIcon.style.margin = "auto";
-  let minusLine = document.createElement("div");
-  minusLine.style.width = "10px";
-  minusLine.style.height = "2px";
-  minusLine.style.backgroundColor = "white";
-  minusLine.style.position = "absolute";
-  minusLine.style.top = "50%";
-  minusLine.style.left = "50%";
-  minusLine.style.transform = "translate(-50%, -50%)";
+  const minusIcon = document.createElement("div");
+  applyStyles(minusIcon, MinusIconStyles);
+  const minusLine = document.createElement("div");
+  applyStyles(minusLine, MinusLineStyles);
   minusIcon.appendChild(minusLine);
 
-  let minusButton = document.createElement("div");
-  minusButton.id = "krisinote-clipper-article-minus-button";
-  minusButton.style.width = "27px";
-  minusButton.style.height = "24px";
-  minusButton.style.cursor = "pointer";
-
+  const minusButton = document.createElement("div");
+  minusButton.id = ContainerMinusButtonId;
+  applyStyles(minusButton, ButtonStyles);
   minusButton.appendChild(minusIcon);
 
-  let topElement = document.createElement("div");
-  topElement.style.position = "absolute";
-  topElement.style.top = "-12px";
-  topElement.style.left = "50%";
-  topElement.style.width = "54px";
-  topElement.style.height = "24px";
-  topElement.style.display = "flex";
-  topElement.style.flexDirection = "row";
-  topElement.style.pointerEvents = "all";
+  const topElement = document.createElement("div");
+  applyStyles(topElement, TopElementStyles);
 
   topElement.appendChild(plusButton);
   topElement.appendChild(minusButton);
@@ -386,13 +329,13 @@ export const createNewSpecialWrapper = (
 
   if (currentSelectedElementWrapper) {
     document
-      .getElementById("krisinote-clipper-article-plus-button")
+      .getElementById(ContainerPlusButtonId)
       ?.removeEventListener("click", eventHandlers.handlePlusButtonClick);
     document
-      .getElementById("krisinote-clipper-article-minus-button")
+      .getElementById(ContainerMinusButtonId)
       ?.removeEventListener("click", eventHandlers.handleMinusButtonClick);
     document
-      .getElementById("krisinote-clipper-selection-container")
+      .getElementById(SelectionContainerId)
       ?.removeChild(currentSelectedElementWrapper);
   }
 
@@ -404,10 +347,10 @@ export const createNewSpecialWrapper = (
   );
   putButtons(id);
   document
-    .getElementById("krisinote-clipper-article-plus-button")
+    .getElementById(ContainerPlusButtonId)
     ?.addEventListener("click", eventHandlers.handlePlusButtonClick);
   document
-    .getElementById("krisinote-clipper-article-minus-button")
+    .getElementById(ContainerMinusButtonId)
     ?.addEventListener("click", eventHandlers.handleMinusButtonClick);
 };
 

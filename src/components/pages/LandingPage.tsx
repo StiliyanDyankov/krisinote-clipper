@@ -1,30 +1,24 @@
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   SelectType,
-  WrapperTypes,
   createNewSpecialWrapper,
-  createNewWrapper,
   createSelectionContainer,
   getArticleSelectionEl,
   isElementViable,
-  krisinoteDOMParser,
   parseDomTree,
-  putButtons,
   removeSelectionContainer,
-  removeWrappers,
 } from "../../utils/lib";
-import {
-  Button,
-  CircularProgress,
-  Divider,
-  IconButton,
-  TextField,
-} from "@mui/material";
+import { Button, CircularProgress, Divider } from "@mui/material";
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined";
 import { colorsTailwind } from "../../App";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+import {
+  ContainerMinusButtonId,
+  ContainerPlusButtonId,
+  SelectionContainerId,
+} from "../../utils/constants";
 
 const LandingPage = ({
   onMultiSelectClick,
@@ -35,11 +29,9 @@ const LandingPage = ({
 
   const [selectionContainer, setSelectionContainer] =
     useState<HTMLElement | null>(() => {
-      if (document.getElementById("krisinote-clipper-selection-container")) {
+      if (document.getElementById(SelectionContainerId)) {
         document.body.removeChild(
-          document.getElementById(
-            "krisinote-clipper-selection-container",
-          ) as Node,
+          document.getElementById(SelectionContainerId) as Node,
         );
       }
       return createSelectionContainer();
@@ -155,27 +147,25 @@ const LandingPage = ({
   }, [selectType]);
 
   useEffect(() => {
-    console.log(window);
     if (selectionContainer) {
       // attach new event listeners
       document
-        .getElementById("krisinote-clipper-article-plus-button")
+        .getElementById(ContainerPlusButtonId)
         ?.addEventListener("click", handlePlusButtonClick);
       document
-        .getElementById("krisinote-clipper-article-minus-button")
+        .getElementById(ContainerMinusButtonId)
         ?.addEventListener("click", handleMinusButtonClick);
     }
     return () => {
       document
-        .getElementById("krisinote-clipper-article-plus-button")
+        .getElementById(ContainerPlusButtonId)
         ?.removeEventListener("click", handlePlusButtonClick);
       document
-        .getElementById("krisinote-clipper-article-minus-button")
+        .getElementById(ContainerMinusButtonId)
         ?.removeEventListener("click", handleMinusButtonClick);
       if (
-        document.getElementById("krisinote-clipper-selection-container") &&
-        document.getElementById("krisinote-clipper-selection-container")
-          ?.children.length
+        document.getElementById(SelectionContainerId) &&
+        document.getElementById(SelectionContainerId)?.children.length
       ) {
         removeSelectionContainer();
       }

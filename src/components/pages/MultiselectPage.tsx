@@ -1,15 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  WrapperTypes,
   createNewWrapper,
   createSelectionContainer,
   findAndAnnihilateChildren,
   getElementDepth,
-  krisinoteDOMParser,
   removeHoverWrapper,
   removeSelectionContainer,
   parseDomTree,
-  MultiSelectionTypes,
   getViableParent,
 } from "../../utils/lib";
 import { Button, CircularProgress, Divider } from "@mui/material";
@@ -17,6 +14,7 @@ import { colorsTailwind } from "../../App";
 import CodeRoundedIcon from "@mui/icons-material/CodeRounded";
 import NotesOutlinedIcon from "@mui/icons-material/NotesOutlined";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+import { MultiSelectionTypes, WrapperTypes } from "../../utils/constants";
 
 const MultiselectPage = () => {
   const [selectionContainer, setSelectionContainer] =
