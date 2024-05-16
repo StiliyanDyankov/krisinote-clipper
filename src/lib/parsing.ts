@@ -1,7 +1,8 @@
 import {
-  TestBoxStyles,
+  ResultWindowStyles,
   DefaultStylesToBeCoppied,
-  SizingStylesToBeCoppied
+  SizingStylesToBeCoppied,
+  INSERTION_VIEWPORT_WIDTH
 } from "./constants"
 import { applyStyles } from "./lib"
 
@@ -11,9 +12,9 @@ export const parseDomTree = async (
   el: HTMLElement | Map<Number, HTMLElement>,
   multiselect: boolean = false
 ) => {
-  const testBox = document.createElement("div")
-  applyStyles(testBox, TestBoxStyles)
-  document.body.appendChild(testBox)
+  const resultWindow = document.createElement("div")
+  applyStyles(resultWindow, ResultWindowStyles)
+  document.body.appendChild(resultWindow)
 
   if (multiselect) {
     ;(el as Map<Number, HTMLElement>).forEach((el) => {
@@ -24,7 +25,10 @@ export const parseDomTree = async (
 
       // just for testing purposes
 
-      testBox.insertAdjacentHTML("afterbegin", xmls.serializeToString(cloned))
+      resultWindow.insertAdjacentHTML(
+        "afterbegin",
+        xmls.serializeToString(cloned)
+      )
       const link = document.querySelectorAll("head link")
 
       console.log(
@@ -66,7 +70,10 @@ export const parseDomTree = async (
 
     // just for testing purposes
 
-    testBox.insertAdjacentHTML("afterbegin", xmls.serializeToString(cloned))
+    resultWindow.insertAdjacentHTML(
+      "afterbegin",
+      xmls.serializeToString(cloned)
+    )
     const link = document.querySelectorAll("head link")
 
     console.log(
@@ -120,8 +127,6 @@ export const krisinoteDOMParser = (entryElement: HTMLElement) => {
 
   return entryElementClone
 }
-
-const INSERTION_VIEWPORT_WIDTH = 1000
 
 const parseGridTemplateColumns = (original: string): string => {
   const split = original.split(" ")

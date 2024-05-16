@@ -113,7 +113,7 @@ export const HoverWrapperStyles: StyleDeclaration = {
   zIndex: "99998"
 }
 
-export const TestBoxStyles: StyleDeclaration = {
+export const ResultWindowStyles: StyleDeclaration = {
   position: "fixed",
   left: "12px",
   top: "12px",
@@ -255,3 +255,5 @@ export const SizingStylesToBeCoppied = [
 
   "gap"
 ]
+
+export const INSERTION_VIEWPORT_WIDTH = 1000
