@@ -134,3 +134,124 @@ export const RootElementStyles: StyleDeclaration = {
   height: "auto",
   zIndex: "99999"
 }
+
+export enum SelectType {
+  ARTICLE = "ARTICLE",
+  FULL_PAGE = "FULL_PAGE",
+  SIMPLIFIED_ARTICLE = "SIMPLIFIED_ARTICLE"
+}
+
+export const DefaultStylesToBeCoppied = [
+  "color",
+  "display",
+  "box-sizing",
+  "box-shadow",
+
+  "visibility",
+  "z-index",
+  "position",
+
+  "max-width",
+  "min-width",
+  "max-height",
+  "min-height",
+
+  "flex-direction",
+  "flex-wrap",
+  "flex-flow",
+  "justify-content",
+  "align-items",
+  "align-content",
+  "gap",
+  "row-gap",
+  "column-gap",
+  "order",
+  "flex-grow",
+  "flex-shrink",
+  "flex-basis",
+  "flex",
+  "align-self",
+
+  "grid-template-columns",
+  "grid-template-areas",
+  "grid-template",
+  "column-gap",
+  "row-gap",
+  "gap",
+  "justify-items",
+  "align-items",
+  "place-items",
+  "justify-content",
+  "align-content",
+  "place-content",
+  "grid-auto-columns",
+  "grid-auto-rows",
+  "grid-auto-flow",
+  "grid",
+  "grid-column-start",
+  "grid-column-end",
+  "grid-row-start",
+  "grid-row-end",
+  "grid-column",
+  "grid-row",
+  "grid-area",
+  "justify-self",
+  "align-self",
+  "place-self",
+
+  "font-size",
+  "font-style",
+  "font-family",
+  "font-weight",
+  "overflow-wrap",
+  "contain",
+  "line-height",
+  "tab-size",
+  "text-size-adjust",
+  "text-transform",
+  "letter-spacing",
+  "vertical-align",
+  "text-decoration",
+
+  "border-color",
+  "border-width",
+  "border-style",
+  "border-bottom-left-radius",
+  "border-bottom-right-radius",
+  "border-top-left-radius",
+  "border-top-right-radius",
+  "border-image-outset",
+  "border-image-repeat",
+  "border-image-slice",
+  "border-image-source",
+  "border-image-width",
+
+  "padding-top",
+  "padding-right",
+  "padding-left",
+  "padding-bottom",
+
+  "margin-top",
+  "margin-right",
+  "margin-left",
+  "margin-bottom",
+
+  "background-color",
+
+  "overflow-x",
+  "overflow-y",
+
+  "list-style-image",
+  "list-style-position",
+  "list-style-type"
+]
+
+export const SizingStylesToBeCoppied = [
+  "padding-right",
+  "padding-left",
+
+  "margin-right",
+  "margin-left",
+
+  "gap"
+]

@@ -1,13 +1,4 @@
 import { useEffect, useRef, useState } from "react"
-import {
-  SelectType,
-  createNewSpecialWrapper,
-  createSelectionContainer,
-  getArticleSelectionEl,
-  isElementViable,
-  parseDomTree,
-  removeSelectionContainer
-} from "../lib/lib"
 import { Button, CircularProgress, Divider } from "@mui/material"
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined"
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined"
@@ -17,8 +8,17 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import {
   ContainerMinusButtonId,
   ContainerPlusButtonId,
+  SelectType,
   SelectionContainerId
 } from "../lib/constants"
+import { parseDomTree } from "../lib/parsing"
+import {
+  createSelectionContainer,
+  getArticleSelectionEl,
+  createNewSpecialWrapper,
+  isElementViable,
+  removeSelectionContainer
+} from "../lib/selection"
 
 const LandingPage = ({
   onMultiSelectClick
