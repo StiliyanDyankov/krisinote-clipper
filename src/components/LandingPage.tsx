@@ -7,18 +7,18 @@ import {
   isElementViable,
   parseDomTree,
   removeSelectionContainer
-} from "../../utils/lib"
+} from "../lib/lib"
 import { Button, CircularProgress, Divider } from "@mui/material"
 import LibraryAddOutlinedIcon from "@mui/icons-material/LibraryAddOutlined"
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined"
 import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined"
-import { colorsTailwind } from "../../App"
+import { colorsTailwind } from "../App"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import {
   ContainerMinusButtonId,
   ContainerPlusButtonId,
   SelectionContainerId
-} from "../../utils/constants"
+} from "../lib/constants"
 
 const LandingPage = ({
   onMultiSelectClick

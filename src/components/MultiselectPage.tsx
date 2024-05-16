@@ -8,13 +8,13 @@ import {
   removeSelectionContainer,
   parseDomTree,
   getViableParent
-} from "../../utils/lib"
+} from "../lib/lib"
 import { Button, CircularProgress, Divider } from "@mui/material"
-import { colorsTailwind } from "../../App"
+import { colorsTailwind } from "../App"
 import CodeRoundedIcon from "@mui/icons-material/CodeRounded"
 import NotesOutlinedIcon from "@mui/icons-material/NotesOutlined"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import { MultiSelectionTypes, WrapperTypes } from "../../utils/constants"
+import { MultiSelectionTypes, WrapperTypes } from "../lib/constants"
 
 const MultiselectPage = () => {
   const [selectionContainer, setSelectionContainer] =

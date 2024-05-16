@@ -1,18 +1,13 @@
 import { useState } from "react"
-import LandingPage from "./components/pages/LandingPage"
-import MultiselectPage from "./components/pages/MultiselectPage"
-import SaveProcessPage from "./components/pages/SaveProcessPage"
-import SaveSuccessPage from "./components/pages/SaveSuccessPage"
+import LandingPage from "./components/LandingPage"
+import MultiselectPage from "./components/MultiselectPage"
 import { ThemeProvider, createTheme } from "@mui/material/styles"
 import { IconButton } from "@mui/material"
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded"
-import LoadingPage from "./components/pages/LoadingPage"
 
 enum PageState {
   LANDING = "LANDING",
   MUTLISELECT = "MULTISELECT",
-  SAVE_PROCESS = "SAVE_PROCESS",
-  SAVE_SUCCESS = "SAVE_SUCCESS",
   LOADING = "LOADING"
 }
 
@@ -137,13 +132,10 @@ function App({ id, onExit }: { id?: any; onExit: (request: any) => void }) {
                 />
               </IconButton>
             </div>
-            {pageState === PageState.LOADING ? <LoadingPage /> : null}
             {pageState === PageState.LANDING ? (
               <LandingPage onMultiSelectClick={handleMultiselectClick} />
             ) : null}
             {pageState === PageState.MUTLISELECT ? <MultiselectPage /> : null}
-            {pageState === PageState.SAVE_PROCESS ? <SaveProcessPage /> : null}
-            {pageState === PageState.SAVE_SUCCESS ? <SaveSuccessPage /> : null}
           </div>
         </ThemeProvider>
       </div>

@@ -1,8 +1,8 @@
 import React from "react"
 import ReactDOM from "react-dom/client"
 import App from "./App"
-import { applyStyles } from "./utils/lib"
-import { RootElementStyles } from "./utils/constants"
+import { applyStyles } from "./lib/lib"
+import { RootElementStyles } from "./lib/constants"
 
 export let root: any = null
 const rootElement = document.createElement("div")
