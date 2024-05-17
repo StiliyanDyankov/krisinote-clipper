@@ -26,12 +26,15 @@ export const removeWrappers = (): void => {
   }
 }
 
-export const isElementViable = (element: HTMLElement): boolean => {
-  return (
+export const isElementViable = (element: Element): HTMLElement | undefined => {
+  if (
+    element instanceof HTMLElement &&
     window.getComputedStyle(element).getPropertyValue("display") !== "inline" &&
     !UnviableElements.includes(element.nodeName) &&
     element.id !== SelectionContainerId
-  )
+  ) {
+    return element
+  }
 }
 
 export const getViableParent = (element: HTMLElement): HTMLElement => {
@@ -236,4 +239,24 @@ export const createNewTracingElementWrapper = (
   document
     .getElementById(ContainerMinusButtonId)
     ?.addEventListener("click", eventHandlers.handleMinusButtonClick)
+}
+
+export const getParentTracingElement = (
+  element: HTMLElement
+): HTMLElement | undefined => {
+  const parent = element.parentElement
+
+  if (parent && parent.nodeName !== "BODY") {
+    return parent
+  }
+}
+
+export const getChildTracingElement = (
+  element: HTMLElement
+): HTMLElement | undefined => {
+  const child = element.firstElementChild
+
+  if (child) {
+    return isElementViable(child)
+  }
 }

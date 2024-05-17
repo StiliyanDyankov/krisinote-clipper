@@ -141,6 +141,8 @@ export enum SelectType {
   SIMPLIFIED_ARTICLE = "SIMPLIFIED_ARTICLE"
 }
 
+export type TracingDirection = "up" | "down"
+
 export const DefaultStylesToBeCoppied = [
   "color",
   "display",

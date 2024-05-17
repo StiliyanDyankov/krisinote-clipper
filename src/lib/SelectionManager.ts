@@ -2,13 +2,15 @@ import {
   ContainerMinusButtonId,
   ContainerPlusButtonId,
   SelectType,
-  SelectionContainerId
+  SelectionContainerId,
+  TracingDirection
 } from "./constants"
 import {
   createNewTracingElementWrapper,
   createSelectionContainer,
   getArticleSelectionEl,
-  isElementViable,
+  getChildTracingElement,
+  getParentTracingElement,
   removeSelectionContainer
 } from "./selection"
 
@@ -62,34 +64,33 @@ export class SelectionManager {
   }
 
   handlePlusButtonClick = () => {
-    const currentSelectedEl = this.getCurrentSelectedTracingElement()
+    this.handleTracingButtonPress("up")
+  }
 
-    if (!currentSelectedEl) {
+  handleMinusButtonClick = () => {
+    this.handleTracingButtonPress("down")
+  }
+
+  handleTracingButtonPress = (direction: TracingDirection) => {
+    if (!this.selectionContainer) {
       return
     }
 
-    let nextElement: HTMLElement
+    const tracingDelta = direction === "up" ? 1 : -1
 
-    this.currentSelectedElementKey++
+    const nextElement = this.getNextTracingElement(direction)
 
-    if (this.selectedElementsMap.has(this.currentSelectedElementKey)) {
-      nextElement = this.selectedElementsMap.get(
-        this.currentSelectedElementKey
-      ) as HTMLElement
-    } else if (
-      currentSelectedEl.parentNode &&
-      currentSelectedEl.parentNode.nodeName !== "BODY"
-    ) {
-      nextElement = currentSelectedEl.parentNode as HTMLElement
-
-      this.selectedElementsMap.set(this.currentSelectedElementKey, nextElement)
-    } else {
+    if (!nextElement) {
       return
     }
+
+    this.currentSelectedElementKey += tracingDelta
+
+    this.selectedElementsMap.set(this.currentSelectedElementKey, nextElement)
 
     createNewTracingElementWrapper(
       nextElement,
-      this.selectionContainer as HTMLElement,
+      this.selectionContainer,
       this.currentSelectedElementKey,
       {
         handlePlusButtonClick: this.handlePlusButtonClick,
@@ -98,41 +99,26 @@ export class SelectionManager {
     )
   }
 
-  handleMinusButtonClick = () => {
+  getNextTracingElement = (direction: TracingDirection) => {
+    const depthDelta = direction === "up" ? 1 : -1
+
+    const nextCachedElement = this.selectedElementsMap.get(
+      this.currentSelectedElementKey + depthDelta
+    )
+
+    if (nextCachedElement) {
+      return nextCachedElement
+    }
+
     const currentSelectedEl = this.getCurrentSelectedTracingElement()
 
     if (!currentSelectedEl) {
       return
     }
 
-    let nextElement: HTMLElement
-
-    this.currentSelectedElementKey--
-
-    if (this.selectedElementsMap.has(this.currentSelectedElementKey - 1)) {
-      nextElement = this.selectedElementsMap.get(
-        this.currentSelectedElementKey
-      ) as HTMLElement
-    } else if (
-      currentSelectedEl.firstChild &&
-      isElementViable(currentSelectedEl.firstChild as HTMLElement)
-    ) {
-      nextElement = currentSelectedEl.firstChild as HTMLElement
-
-      this.selectedElementsMap.set(this.currentSelectedElementKey, nextElement)
-    } else {
-      return
-    }
-
-    createNewTracingElementWrapper(
-      nextElement,
-      this.selectionContainer as HTMLElement,
-      this.currentSelectedElementKey,
-      {
-        handlePlusButtonClick: this.handlePlusButtonClick,
-        handleMinusButtonClick: this.handleMinusButtonClick
-      }
-    )
+    return direction === "up"
+      ? getParentTracingElement(currentSelectedEl)
+      : getChildTracingElement(currentSelectedEl)
   }
 
   setSelectionType = (selectionType: SelectType) => {
