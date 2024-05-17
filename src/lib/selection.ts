@@ -4,7 +4,6 @@ import {
   SelectionContainerId,
   WrapperTypes,
   UnviableElements,
-  StyleDeclaration,
   HoverWrapperStyles,
   PlusIconStyles,
   PlusLineHorizontalStyles,

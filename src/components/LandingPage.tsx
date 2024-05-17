@@ -29,9 +29,7 @@ const LandingPage = ({
         selectionManagerInstance.current?.selectedElementsMap.get(
           selectionManagerInstance.current?.currentSelectedElementKey
         ) as HTMLElement
-      ).then(() => {
-        setIsLoading(false)
-      })
+      )
     }
   }, [isLoading])
 

@@ -66,80 +66,70 @@ export class SelectionManager {
     const currentSelectedEl = this.selectedElementsMap.get(
       this.currentSelectedElementKey
     )
-    // check if a parent element has been traced before
-    if (this.selectedElementsMap.has(this.currentSelectedElementKey + 1)) {
-      this.currentSelectedElementKey++
-      createNewSpecialWrapper(
-        this.selectedElementsMap.get(
-          this.currentSelectedElementKey
-        ) as HTMLElement,
-        this.currentSelectedElementContainer as HTMLElement,
-        this.currentSelectedElementKey,
-        {
-          handlePlusButtonClick: this.handlePlusButtonClick,
-          handleMinusButtonClick: this.handleMinusButtonClick
-        }
-      )
-      // check if element has a parent and it's not body
+
+    let nextElement: HTMLElement
+
+    this.currentSelectedElementKey++
+
+    if (this.selectedElementsMap.has(this.currentSelectedElementKey)) {
+      nextElement = this.selectedElementsMap.get(
+        this.currentSelectedElementKey
+      ) as HTMLElement
     } else if (
       currentSelectedEl?.parentNode &&
       currentSelectedEl?.parentNode.nodeName !== "BODY"
     ) {
-      this.currentSelectedElementKey++
-      this.selectedElementsMap.set(
-        this.currentSelectedElementKey,
-        currentSelectedEl?.parentNode as HTMLElement
-      )
-      createNewSpecialWrapper(
-        currentSelectedEl.parentNode as HTMLElement,
-        this.currentSelectedElementContainer as HTMLElement,
-        this.currentSelectedElementKey,
-        {
-          handlePlusButtonClick: this.handlePlusButtonClick,
-          handleMinusButtonClick: this.handleMinusButtonClick
-        }
-      )
+      nextElement = currentSelectedEl?.parentNode as HTMLElement
+
+      this.selectedElementsMap.set(this.currentSelectedElementKey, nextElement)
+    } else {
+      return
     }
+
+    createNewSpecialWrapper(
+      nextElement,
+      this.currentSelectedElementContainer as HTMLElement,
+      this.currentSelectedElementKey,
+      {
+        handlePlusButtonClick: this.handlePlusButtonClick,
+        handleMinusButtonClick: this.handleMinusButtonClick
+      }
+    )
   }
 
   handleMinusButtonClick = () => {
     const currentSelectedEl = this.selectedElementsMap.get(
       this.currentSelectedElementKey
     )
-    // check if a child element has been traced before
+
+    let nextElement: HTMLElement
+
+    this.currentSelectedElementKey--
+
     if (this.selectedElementsMap.has(this.currentSelectedElementKey - 1)) {
-      this.currentSelectedElementKey--
-      createNewSpecialWrapper(
-        this.selectedElementsMap.get(
-          this.currentSelectedElementKey
-        ) as HTMLElement,
-        this.currentSelectedElementContainer as HTMLElement,
-        this.currentSelectedElementKey,
-        {
-          handlePlusButtonClick: this.handlePlusButtonClick,
-          handleMinusButtonClick: this.handleMinusButtonClick
-        }
-      )
-      //check if element has a child and it's a viable element
+      nextElement = this.selectedElementsMap.get(
+        this.currentSelectedElementKey
+      ) as HTMLElement
     } else if (
       currentSelectedEl?.firstChild &&
       isElementViable(currentSelectedEl?.firstChild as HTMLElement)
     ) {
-      this.currentSelectedElementKey--
-      this.selectedElementsMap.set(
-        this.currentSelectedElementKey,
-        currentSelectedEl?.firstChild as HTMLElement
-      )
-      createNewSpecialWrapper(
-        currentSelectedEl.firstChild as HTMLElement,
-        this.currentSelectedElementContainer as HTMLElement,
-        this.currentSelectedElementKey,
-        {
-          handlePlusButtonClick: this.handlePlusButtonClick,
-          handleMinusButtonClick: this.handleMinusButtonClick
-        }
-      )
+      nextElement = currentSelectedEl?.firstChild as HTMLElement
+
+      this.selectedElementsMap.set(this.currentSelectedElementKey, nextElement)
+    } else {
+      return
     }
+
+    createNewSpecialWrapper(
+      nextElement,
+      this.currentSelectedElementContainer as HTMLElement,
+      this.currentSelectedElementKey,
+      {
+        handlePlusButtonClick: this.handlePlusButtonClick,
+        handleMinusButtonClick: this.handleMinusButtonClick
+      }
+    )
   }
 
   setSelectionType = (selectionType: SelectType) => {
