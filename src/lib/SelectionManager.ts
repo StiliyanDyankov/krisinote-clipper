@@ -144,35 +144,29 @@ export class SelectionManager {
 
   setSelectionType = (selectionType: SelectType) => {
     if (this.currentSelectedElementContainer) {
+      let selectionElement: HTMLElement
+
       if (selectionType === SelectType.ARTICLE) {
-        this.selectedElementsMap.set(
-          this.currentSelectedElementKey,
-          getArticleSelectionEl()
-        )
-        createNewSpecialWrapper(
-          getArticleSelectionEl(),
-          this.currentSelectedElementContainer,
-          this.currentSelectedElementKey,
-          {
-            handlePlusButtonClick: this.handlePlusButtonClick,
-            handleMinusButtonClick: this.handleMinusButtonClick
-          }
-        )
+        selectionElement = getArticleSelectionEl()
       } else if (selectionType === SelectType.FULL_PAGE) {
-        this.selectedElementsMap.set(
-          this.currentSelectedElementKey,
-          document.body
-        )
-        createNewSpecialWrapper(
-          document.body,
-          this.currentSelectedElementContainer,
-          this.currentSelectedElementKey,
-          {
-            handlePlusButtonClick: this.handlePlusButtonClick,
-            handleMinusButtonClick: this.handleMinusButtonClick
-          }
-        )
+        selectionElement = document.body
+      } else {
+        return
       }
+
+      this.selectedElementsMap.set(
+        this.currentSelectedElementKey,
+        selectionElement
+      )
+      createNewSpecialWrapper(
+        selectionElement,
+        this.currentSelectedElementContainer,
+        this.currentSelectedElementKey,
+        {
+          handlePlusButtonClick: this.handlePlusButtonClick,
+          handleMinusButtonClick: this.handleMinusButtonClick
+        }
+      )
     }
 
     this.selectionType = selectionType
