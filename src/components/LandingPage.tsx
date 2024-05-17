@@ -5,20 +5,9 @@ import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined"
 import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined"
 import { colorsTailwind } from "../App"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import {
-  ContainerMinusButtonId,
-  ContainerPlusButtonId,
-  SelectType,
-  SelectionContainerId
-} from "../lib/constants"
+import { SelectType } from "../lib/constants"
 import { parseDomTree } from "../lib/parsing"
-import {
-  createSelectionContainer,
-  getArticleSelectionEl,
-  createNewSpecialWrapper,
-  isElementViable,
-  removeSelectionContainer
-} from "../lib/selection"
+import { SelectionManager } from "../lib/SelectionManager"
 
 const LandingPage = ({
   onMultiSelectClick
@@ -28,159 +17,39 @@ const LandingPage = ({
   const [selectionType, setSelectionType] = useState<SelectType>(
     SelectType.ARTICLE
   )
-
-  const [selectionContainer, setSelectionContainer] =
-    useState<HTMLElement | null>(() => {
-      if (document.getElementById(SelectionContainerId)) {
-        document.body.removeChild(
-          document.getElementById(SelectionContainerId) as Node
-        )
-      }
-      return createSelectionContainer()
-    })
-
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const currentSelectedElementKey = useRef(9999)
-
-  const [selectedElements, setSelectedElements] = useState<
-    Map<number, HTMLElement>
-  >(() => {
-    const selEl = new Map<number, HTMLElement>()
-    selEl.set(currentSelectedElementKey.current, getArticleSelectionEl())
-    return selEl
-  })
-
-  const handlePlusButtonClick = () => {
-    const currentSelectedEl = selectedElements.get(
-      currentSelectedElementKey.current
-    )
-    // check if a parent element has been traced before
-    if (selectedElements.has(currentSelectedElementKey.current + 1)) {
-      currentSelectedElementKey.current++
-      createNewSpecialWrapper(
-        selectedElements.get(currentSelectedElementKey.current) as HTMLElement,
-        selectionContainer as HTMLElement,
-        currentSelectedElementKey.current,
-        { handlePlusButtonClick, handleMinusButtonClick }
-      )
-      // check if element has a parent and it's not body
-    } else if (
-      currentSelectedEl?.parentNode &&
-      currentSelectedEl?.parentNode.nodeName !== "BODY"
-    ) {
-      currentSelectedElementKey.current++
-      selectedElements.set(
-        currentSelectedElementKey.current,
-        currentSelectedEl?.parentNode as HTMLElement
-      )
-      createNewSpecialWrapper(
-        currentSelectedEl.parentNode as HTMLElement,
-        selectionContainer as HTMLElement,
-        currentSelectedElementKey.current,
-        { handlePlusButtonClick, handleMinusButtonClick }
-      )
-    }
-  }
-
-  const handleMinusButtonClick = () => {
-    const currentSelectedEl = selectedElements.get(
-      currentSelectedElementKey.current
-    )
-    // check if a child element has been traced before
-    if (selectedElements.has(currentSelectedElementKey.current - 1)) {
-      currentSelectedElementKey.current--
-      createNewSpecialWrapper(
-        selectedElements.get(currentSelectedElementKey.current) as HTMLElement,
-        selectionContainer as HTMLElement,
-        currentSelectedElementKey.current,
-        { handlePlusButtonClick, handleMinusButtonClick }
-      )
-      //check if element has a child and it's a viable element
-    } else if (
-      currentSelectedEl?.firstChild &&
-      isElementViable(currentSelectedEl?.firstChild as HTMLElement)
-    ) {
-      currentSelectedElementKey.current--
-      selectedElements.set(
-        currentSelectedElementKey.current,
-        currentSelectedEl?.firstChild as HTMLElement
-      )
-      createNewSpecialWrapper(
-        currentSelectedEl.firstChild as HTMLElement,
-        selectionContainer as HTMLElement,
-        currentSelectedElementKey.current,
-        { handlePlusButtonClick, handleMinusButtonClick }
-      )
-    }
-  }
-
-  useEffect(() => {
-    if (selectionContainer) {
-      if (selectionType === SelectType.ARTICLE) {
-        setSelectedElements(
-          new Map<number, HTMLElement>().set(
-            currentSelectedElementKey.current,
-            getArticleSelectionEl()
-          )
-        )
-        createNewSpecialWrapper(
-          getArticleSelectionEl(),
-          selectionContainer as HTMLElement,
-          currentSelectedElementKey.current,
-          { handlePlusButtonClick, handleMinusButtonClick }
-        )
-      } else if (selectionType === SelectType.FULL_PAGE) {
-        setSelectedElements(
-          new Map<number, HTMLElement>().set(
-            currentSelectedElementKey.current,
-            document.body
-          )
-        )
-        createNewSpecialWrapper(
-          document.body,
-          selectionContainer as HTMLElement,
-          currentSelectedElementKey.current,
-          { handlePlusButtonClick, handleMinusButtonClick }
-        )
-      }
-    }
-  }, [selectionType])
-
-  useEffect(() => {
-    if (selectionContainer) {
-      document
-        .getElementById(ContainerPlusButtonId)
-        ?.addEventListener("click", handlePlusButtonClick)
-      document
-        .getElementById(ContainerMinusButtonId)
-        ?.addEventListener("click", handleMinusButtonClick)
-    }
-    return () => {
-      document
-        .getElementById(ContainerPlusButtonId)
-        ?.removeEventListener("click", handlePlusButtonClick)
-      document
-        .getElementById(ContainerMinusButtonId)
-        ?.removeEventListener("click", handleMinusButtonClick)
-      if (
-        document.getElementById(SelectionContainerId) &&
-        document.getElementById(SelectionContainerId)?.children.length
-      ) {
-        removeSelectionContainer()
-      }
-    }
-  }, [])
+  const selectionManagerInstance = useRef<SelectionManager | undefined>(
+    undefined
+  )
 
   useEffect(() => {
     if (isLoading) {
       parseDomTree(
-        selectedElements.get(currentSelectedElementKey.current) as HTMLElement
+        selectionManagerInstance.current?.selectedElementsMap.get(
+          selectionManagerInstance.current?.currentSelectedElementKey
+        ) as HTMLElement
       ).then(() => {
         setIsLoading(false)
       })
     }
   }, [isLoading])
+
+  useEffect(() => {
+    selectionManagerInstance.current = new SelectionManager()
+
+    return () => {
+      if (selectionManagerInstance.current) {
+        selectionManagerInstance.current.cleanup()
+      }
+    }
+  }, [])
+
+  useEffect(() => {
+    if (selectionManagerInstance.current) {
+      selectionManagerInstance.current.setSelectionType(selectionType)
+    }
+  }, [selectionType])
 
   const handleClick = () => {
     setIsLoading(true)

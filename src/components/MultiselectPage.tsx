@@ -1,20 +1,20 @@
 import { useEffect, useRef, useState } from "react"
-import {
-  createNewWrapper,
-  createSelectionContainer,
-  findAndAnnihilateChildren,
-  getElementDepth,
-  removeHoverWrapper,
-  removeSelectionContainer,
-  parseDomTree,
-  getViableParent
-} from "../lib/lib"
 import { Button, CircularProgress, Divider } from "@mui/material"
 import { colorsTailwind } from "../App"
 import CodeRoundedIcon from "@mui/icons-material/CodeRounded"
 import NotesOutlinedIcon from "@mui/icons-material/NotesOutlined"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { MultiSelectionTypes, WrapperTypes } from "../lib/constants"
+import { parseDomTree } from "../lib/parsing"
+import {
+  createSelectionContainer,
+  createNewWrapper,
+  removeHoverWrapper,
+  findAndAnnihilateChildren,
+  getElementDepth,
+  getViableParent,
+  removeSelectionContainer
+} from "../lib/selection"
 
 const MultiselectPage = () => {
   const [selectionContainer, setSelectionContainer] =
