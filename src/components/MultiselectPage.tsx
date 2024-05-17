@@ -4,11 +4,15 @@ import { colorsTailwind } from "../App"
 import CodeRoundedIcon from "@mui/icons-material/CodeRounded"
 import NotesOutlinedIcon from "@mui/icons-material/NotesOutlined"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import { MultiSelectionTypes, WrapperTypes } from "../lib/constants"
+import {
+  MultiSelectionTypes,
+  SelectionContainerId,
+  WrapperTypes
+} from "../lib/constants"
 import { parseDomTree } from "../lib/parsing"
 import {
   createSelectionContainer,
-  createNewWrapper,
+  createNewElementWrapper,
   removeHoverWrapper,
   findAndAnnihilateChildren,
   getElementDepth,
@@ -19,11 +23,9 @@ import {
 const MultiselectPage = () => {
   const [selectionContainer, setSelectionContainer] =
     useState<HTMLElement | null>(() => {
-      if (document.getElementById("krisinote-clipper-selection-container")) {
+      if (document.getElementById(SelectionContainerId)) {
         document.body.removeChild(
-          document.getElementById(
-            "krisinote-clipper-selection-container"
-          ) as Node
+          document.getElementById(SelectionContainerId) as Node
         )
       }
       return createSelectionContainer()
@@ -59,7 +61,7 @@ const MultiselectPage = () => {
         getViableOutlinedElement(hoveredElement)
       if (!outlinedElement) return
 
-      createNewWrapper(
+      createNewElementWrapper(
         outlinedElement,
         selectionContainer as HTMLElement,
         WrapperTypes.hover
@@ -97,7 +99,7 @@ const MultiselectPage = () => {
       setSelectedElements(selectedElements)
       setSelectedElementsDepth(selectedElementsDepth)
       document
-        .getElementById("krisinote-clipper-selection-container")
+        .getElementById(SelectionContainerId)
         ?.removeChild(outlinedElement)
     } else {
       // executed on initial selection of an element
@@ -118,7 +120,7 @@ const MultiselectPage = () => {
           )
         )
       )
-      createNewWrapper(
+      createNewElementWrapper(
         outlinedElement,
         selectionContainer as HTMLElement,
         WrapperTypes.selection,

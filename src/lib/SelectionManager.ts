@@ -5,7 +5,7 @@ import {
   SelectionContainerId
 } from "./constants"
 import {
-  createNewSpecialWrapper,
+  createNewTracingElementWrapper,
   createSelectionContainer,
   getArticleSelectionEl,
   isElementViable,
@@ -13,21 +13,20 @@ import {
 } from "./selection"
 
 export class SelectionManager {
-  public currentSelectedElementKey: number = 9999
+  public currentSelectedElementKey = 9999
   public selectedElementsMap: Map<number, HTMLElement> = new Map()
-  private currentSelectedElementContainer: HTMLElement | null = null
+  private selectionContainer: HTMLElement | null = null
   private selectionType: SelectType = SelectType.ARTICLE
 
   constructor() {
-    this.currentSelectedElementContainer =
-      this.handleInitialSelectionContainerCreation()
+    this.selectionContainer = this.handleInitialSelectionContainerCreation()
 
     this.selectedElementsMap.set(
       this.currentSelectedElementKey,
       getArticleSelectionEl()
     )
 
-    if (this.currentSelectedElementContainer) {
+    if (this.selectionContainer) {
       document
         .getElementById(ContainerPlusButtonId)
         ?.addEventListener("click", this.handlePlusButtonClick)
@@ -63,9 +62,11 @@ export class SelectionManager {
   }
 
   handlePlusButtonClick = () => {
-    const currentSelectedEl = this.selectedElementsMap.get(
-      this.currentSelectedElementKey
-    )
+    const currentSelectedEl = this.getCurrentSelectedTracingElement()
+
+    if (!currentSelectedEl) {
+      return
+    }
 
     let nextElement: HTMLElement
 
@@ -76,19 +77,19 @@ export class SelectionManager {
         this.currentSelectedElementKey
       ) as HTMLElement
     } else if (
-      currentSelectedEl?.parentNode &&
-      currentSelectedEl?.parentNode.nodeName !== "BODY"
+      currentSelectedEl.parentNode &&
+      currentSelectedEl.parentNode.nodeName !== "BODY"
     ) {
-      nextElement = currentSelectedEl?.parentNode as HTMLElement
+      nextElement = currentSelectedEl.parentNode as HTMLElement
 
       this.selectedElementsMap.set(this.currentSelectedElementKey, nextElement)
     } else {
       return
     }
 
-    createNewSpecialWrapper(
+    createNewTracingElementWrapper(
       nextElement,
-      this.currentSelectedElementContainer as HTMLElement,
+      this.selectionContainer as HTMLElement,
       this.currentSelectedElementKey,
       {
         handlePlusButtonClick: this.handlePlusButtonClick,
@@ -98,9 +99,11 @@ export class SelectionManager {
   }
 
   handleMinusButtonClick = () => {
-    const currentSelectedEl = this.selectedElementsMap.get(
-      this.currentSelectedElementKey
-    )
+    const currentSelectedEl = this.getCurrentSelectedTracingElement()
+
+    if (!currentSelectedEl) {
+      return
+    }
 
     let nextElement: HTMLElement
 
@@ -111,19 +114,19 @@ export class SelectionManager {
         this.currentSelectedElementKey
       ) as HTMLElement
     } else if (
-      currentSelectedEl?.firstChild &&
-      isElementViable(currentSelectedEl?.firstChild as HTMLElement)
+      currentSelectedEl.firstChild &&
+      isElementViable(currentSelectedEl.firstChild as HTMLElement)
     ) {
-      nextElement = currentSelectedEl?.firstChild as HTMLElement
+      nextElement = currentSelectedEl.firstChild as HTMLElement
 
       this.selectedElementsMap.set(this.currentSelectedElementKey, nextElement)
     } else {
       return
     }
 
-    createNewSpecialWrapper(
+    createNewTracingElementWrapper(
       nextElement,
-      this.currentSelectedElementContainer as HTMLElement,
+      this.selectionContainer as HTMLElement,
       this.currentSelectedElementKey,
       {
         handlePlusButtonClick: this.handlePlusButtonClick,
@@ -133,7 +136,7 @@ export class SelectionManager {
   }
 
   setSelectionType = (selectionType: SelectType) => {
-    if (this.currentSelectedElementContainer) {
+    if (this.selectionContainer) {
       let selectionElement: HTMLElement
 
       if (selectionType === SelectType.ARTICLE) {
@@ -148,9 +151,9 @@ export class SelectionManager {
         this.currentSelectedElementKey,
         selectionElement
       )
-      createNewSpecialWrapper(
+      createNewTracingElementWrapper(
         selectionElement,
-        this.currentSelectedElementContainer,
+        this.selectionContainer,
         this.currentSelectedElementKey,
         {
           handlePlusButtonClick: this.handlePlusButtonClick,
@@ -160,5 +163,9 @@ export class SelectionManager {
     }
 
     this.selectionType = selectionType
+  }
+
+  getCurrentSelectedTracingElement = () => {
+    return this.selectedElementsMap.get(this.currentSelectedElementKey)
   }
 }

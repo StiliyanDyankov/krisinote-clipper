@@ -54,7 +54,7 @@ export const removeSelectionContainer = (): void => {
   }
 }
 
-export const createNewWrapper = (
+export const createNewElementWrapper = (
   outlinedElement: HTMLElement,
   selectionContainer: HTMLElement,
   type: WrapperTypes,
@@ -198,7 +198,7 @@ export const putButtons = (id: number): void => {
   selectionWrapper.appendChild(topElement)
 }
 
-export const createNewSpecialWrapper = (
+export const createNewTracingElementWrapper = (
   outlinedElement: HTMLElement,
   selectionContainer: HTMLElement,
   id: number,
@@ -223,7 +223,7 @@ export const createNewSpecialWrapper = (
       ?.removeChild(currentSelectedElementWrapper)
   }
 
-  createNewWrapper(
+  createNewElementWrapper(
     outlinedElement,
     selectionContainer as HTMLElement,
     WrapperTypes.selection,
