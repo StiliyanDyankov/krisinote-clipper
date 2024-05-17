@@ -260,3 +260,7 @@ export const getChildTracingElement = (
     return isElementViable(child)
   }
 }
+
+export const getSelectionContainer = (): HTMLElement | null => {
+  return document.getElementById(SelectionContainerId)
+}

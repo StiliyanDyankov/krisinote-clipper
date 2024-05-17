@@ -11,6 +11,7 @@ import {
   getArticleSelectionEl,
   getChildTracingElement,
   getParentTracingElement,
+  getSelectionContainer,
   removeSelectionContainer
 } from "./selection"
 
@@ -45,19 +46,17 @@ export class SelectionManager {
     document
       .getElementById(ContainerMinusButtonId)
       ?.removeEventListener("click", this.handleMinusButtonClick)
-    if (
-      document.getElementById(SelectionContainerId) &&
-      document.getElementById(SelectionContainerId)?.children.length
-    ) {
+
+    if (this.selectionContainer && this.selectionContainer?.children.length) {
       removeSelectionContainer()
     }
   }
 
   handleInitialSelectionContainerCreation = () => {
-    if (document.getElementById(SelectionContainerId)) {
-      document.body.removeChild(
-        document.getElementById(SelectionContainerId) as Node
-      )
+    const selectionContainer = getSelectionContainer()
+
+    if (selectionContainer) {
+      document.body.removeChild(selectionContainer as Node)
     }
 
     return createSelectionContainer()
@@ -122,31 +121,34 @@ export class SelectionManager {
   }
 
   setSelectionType = (selectionType: SelectType) => {
-    if (this.selectionContainer) {
-      let selectionElement: HTMLElement
-
-      if (selectionType === SelectType.ARTICLE) {
-        selectionElement = getArticleSelectionEl()
-      } else if (selectionType === SelectType.FULL_PAGE) {
-        selectionElement = document.body
-      } else {
-        return
-      }
-
-      this.selectedElementsMap.set(
-        this.currentSelectedElementKey,
-        selectionElement
-      )
-      createNewTracingElementWrapper(
-        selectionElement,
-        this.selectionContainer,
-        this.currentSelectedElementKey,
-        {
-          handlePlusButtonClick: this.handlePlusButtonClick,
-          handleMinusButtonClick: this.handleMinusButtonClick
-        }
-      )
+    if (!this.selectionContainer) {
+      return
     }
+
+    let selectionElement: HTMLElement
+
+    if (selectionType === SelectType.ARTICLE) {
+      selectionElement = getArticleSelectionEl()
+    } else if (selectionType === SelectType.FULL_PAGE) {
+      selectionElement = document.body
+    } else {
+      return
+    }
+
+    this.selectedElementsMap.set(
+      this.currentSelectedElementKey,
+      selectionElement
+    )
+
+    createNewTracingElementWrapper(
+      selectionElement,
+      this.selectionContainer,
+      this.currentSelectedElementKey,
+      {
+        handlePlusButtonClick: this.handlePlusButtonClick,
+        handleMinusButtonClick: this.handleMinusButtonClick
+      }
+    )
 
     this.selectionType = selectionType
   }
