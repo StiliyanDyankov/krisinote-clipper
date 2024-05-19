@@ -7,6 +7,7 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import {
   MultiSelectionTypes,
   SelectionContainerId,
+  SelectionWrapperId,
   WrapperTypes
 } from "../lib/constants"
 import { parseDomTree } from "../lib/parsing"
@@ -19,6 +20,7 @@ import {
   getViableParent,
   removeSelectionContainer
 } from "../lib/selection"
+import { SelectionManager } from "../lib/SelectionManager"
 
 const MultiselectPage = () => {
   const [selectionContainer, setSelectionContainer] =
@@ -52,7 +54,7 @@ const MultiselectPage = () => {
   const handleMouseOverEvent = (event: MouseEvent): void => {
     let hoveredElement = event.target as HTMLElement
     if (
-      !hoveredElement.id.startsWith("krisinote-clipper-selection-wrapper") &&
+      !hoveredElement.id.startsWith(SelectionWrapperId) &&
       // last two checks for ignoring pop-up selection
       !hoveredElement.id.startsWith("react-chrome-app") &&
       !(hoveredElement.nodeName === "IFRAME")
@@ -88,9 +90,7 @@ const MultiselectPage = () => {
       //
       // empty - no behaviour if selected element is the clipper itself
       //
-    } else if (
-      outlinedElement.id.startsWith("krisinote-clipper-selection-wrapper")
-    ) {
+    } else if (outlinedElement.id.startsWith(SelectionWrapperId)) {
       // executes on second time selection of an element - removes the selected el
 
       const keyOfSavedElement = parseInt(outlinedElement.id.split("-")[4])
@@ -150,7 +150,7 @@ const MultiselectPage = () => {
       return outlinedElement
     } else if (multiSelectionType.current === MultiSelectionTypes.PARAGRAPH) {
       return outlinedElement.nodeName === "P" ||
-        outlinedElement.id.startsWith("krisinote-clipper-selection-wrapper")
+        outlinedElement.id.startsWith(SelectionWrapperId)
         ? outlinedElement
         : null
     } else return null

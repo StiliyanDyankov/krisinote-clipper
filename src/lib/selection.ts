@@ -11,7 +11,8 @@ import {
   ButtonStyles,
   MinusIconStyles,
   MinusLineStyles,
-  TopElementStyles
+  TopElementStyles,
+  SelectionWrapperId
 } from "./constants"
 import { applyStyles } from "./lib"
 
@@ -119,7 +120,7 @@ export const findAndAnnihilateChildren = (
 
 export const annihilateChild = (keyOfChild: number): void => {
   const childWrapper = document.getElementById(
-    `krisinote-clipper-selection-wrapper-${keyOfChild}`
+    `${SelectionWrapperId}-${keyOfChild}`
   )
   const selectionContainer = document.getElementById(SelectionContainerId)
 
@@ -161,7 +162,7 @@ export const getArticleSelectionEl = (): HTMLElement => {
 
 export const putButtons = (id: number): void => {
   const selectionWrapper = document.getElementById(
-    `krisinote-clipper-selection-wrapper-${id}`
+    `${SelectionWrapperId}-${id}`
   ) as HTMLElement
 
   selectionWrapper.style.position = "absolute"

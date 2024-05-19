@@ -1,6 +1,7 @@
 export const SelectionContainerId = "krisinote-clipper-selection-container"
 export const ContainerPlusButtonId = "krisinote-clipper-article-plus-button"
 export const ContainerMinusButtonId = "krisinote-clipper-article-minus-button"
+export const SelectionWrapperId = "krisinote-clipper-selection-wrapper"
 
 export const UnviableElements = [
   "SPAN",
