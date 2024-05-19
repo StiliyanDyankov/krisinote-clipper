@@ -5,7 +5,7 @@ import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined"
 import NewspaperOutlinedIcon from "@mui/icons-material/NewspaperOutlined"
 import { colorsTailwind } from "../App"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import { SelectType } from "../lib/constants"
+import { SelectionType } from "../lib/constants"
 import { parseDomTree } from "../lib/parsing"
 import { SelectionManager } from "../lib/SelectionManager"
 
@@ -14,8 +14,8 @@ const LandingPage = ({
 }: {
   onMultiSelectClick: () => void
 }) => {
-  const [selectionType, setSelectionType] = useState<SelectType>(
-    SelectType.ARTICLE
+  const [selectionType, setSelectionType] = useState<SelectionType>(
+    SelectionType.ARTICLE
   )
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -23,15 +23,32 @@ const LandingPage = ({
     undefined
   )
 
-  useEffect(() => {
-    if (isLoading) {
-      parseDomTree(
-        selectionManagerInstance.current?.selectedElementsMap.get(
-          selectionManagerInstance.current?.currentSelectedElementKey
-        ) as HTMLElement
-      )
+  const parseElement = () => {
+    const manager = selectionManagerInstance.current
+
+    if (!manager) {
+      return
     }
-  }, [isLoading])
+
+    const selectedElement = manager.selectedElementsMap.get(
+      manager.currentSelectedElementKey
+    )
+
+    if (!selectedElement) {
+      return
+    }
+
+    parseDomTree(selectedElement)
+  }
+
+  const onSelectionPress = (selectionType: SelectionType) => {
+    setSelectionType(selectionType)
+  }
+
+  const handleParse = () => {
+    setIsLoading(true)
+    parseElement()
+  }
 
   useEffect(() => {
     selectionManagerInstance.current = new SelectionManager()
@@ -40,6 +57,8 @@ const LandingPage = ({
       if (selectionManagerInstance.current) {
         selectionManagerInstance.current.cleanup()
       }
+
+      selectionManagerInstance.current = undefined
     }
   }, [])
 
@@ -48,10 +67,6 @@ const LandingPage = ({
       selectionManagerInstance.current.setSelectionType(selectionType)
     }
   }, [selectionType])
-
-  const handleClick = () => {
-    setIsLoading(true)
-  }
 
   return (
     <>
@@ -67,7 +82,7 @@ const LandingPage = ({
           color="primary"
           variant="contained"
           disabled={isLoading}
-          onClick={handleClick}
+          onClick={handleParse}
           style={{
             fontWeight: "700",
             color: "#fff",
@@ -115,7 +130,7 @@ const LandingPage = ({
         <Button
           color="secondary"
           onClick={() => {
-            setSelectionType(SelectType.ARTICLE)
+            onSelectionPress(SelectionType.ARTICLE)
           }}
           style={{
             justifyContent: "flex-start",
@@ -126,12 +141,14 @@ const LandingPage = ({
           startIcon={<NewspaperOutlinedIcon />}
           sx={{
             backgroundColor:
-              selectionType === SelectType.ARTICLE
+              selectionType === SelectionType.ARTICLE
                 ? "rgba(255,255,255,0.1)"
                 : "initial"
           }}
           endIcon={
-            selectionType === SelectType.ARTICLE ? <CheckRoundedIcon /> : null
+            selectionType === SelectionType.ARTICLE ? (
+              <CheckRoundedIcon />
+            ) : null
           }
         >
           <span style={{ flexGrow: 3, justifyContent: "flex-start" }}>
@@ -142,7 +159,7 @@ const LandingPage = ({
         <Button
           color="secondary"
           onClick={() => {
-            setSelectionType(SelectType.FULL_PAGE)
+            onSelectionPress(SelectionType.FULL_PAGE)
           }}
           style={{
             justifyContent: "flex-start",
@@ -153,12 +170,14 @@ const LandingPage = ({
           startIcon={<ArticleOutlinedIcon />}
           sx={{
             backgroundColor:
-              selectionType === SelectType.FULL_PAGE
+              selectionType === SelectionType.FULL_PAGE
                 ? "rgba(255,255,255,0.1)"
                 : "initial"
           }}
           endIcon={
-            selectionType === SelectType.FULL_PAGE ? <CheckRoundedIcon /> : null
+            selectionType === SelectionType.FULL_PAGE ? (
+              <CheckRoundedIcon />
+            ) : null
           }
         >
           <span style={{ flexGrow: 3, justifyContent: "flex-start" }}>

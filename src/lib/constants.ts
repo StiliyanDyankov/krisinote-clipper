@@ -135,10 +135,9 @@ export const RootElementStyles: StyleDeclaration = {
   zIndex: "99999"
 }
 
-export enum SelectType {
+export enum SelectionType {
   ARTICLE = "ARTICLE",
-  FULL_PAGE = "FULL_PAGE",
-  SIMPLIFIED_ARTICLE = "SIMPLIFIED_ARTICLE"
+  FULL_PAGE = "FULL_PAGE"
 }
 
 export type TracingDirection = "up" | "down"

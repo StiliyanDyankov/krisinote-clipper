@@ -1,8 +1,7 @@
 import {
   ContainerMinusButtonId,
   ContainerPlusButtonId,
-  SelectType,
-  SelectionContainerId,
+  SelectionType,
   TracingDirection
 } from "./constants"
 import {
@@ -19,7 +18,7 @@ export class SelectionManager {
   public currentSelectedElementKey = 9999
   public selectedElementsMap: Map<number, HTMLElement> = new Map()
   private selectionContainer: HTMLElement | null = null
-  private selectionType: SelectType = SelectType.ARTICLE
+  private selectionType: SelectionType = SelectionType.ARTICLE
 
   constructor() {
     this.selectionContainer = this.handleInitialSelectionContainerCreation()
@@ -36,19 +35,6 @@ export class SelectionManager {
       document
         .getElementById(ContainerMinusButtonId)
         ?.addEventListener("click", this.handleMinusButtonClick)
-    }
-  }
-
-  cleanup = () => {
-    document
-      .getElementById(ContainerPlusButtonId)
-      ?.removeEventListener("click", this.handlePlusButtonClick)
-    document
-      .getElementById(ContainerMinusButtonId)
-      ?.removeEventListener("click", this.handleMinusButtonClick)
-
-    if (this.selectionContainer && this.selectionContainer?.children.length) {
-      removeSelectionContainer()
     }
   }
 
@@ -120,16 +106,16 @@ export class SelectionManager {
       : getChildTracingElement(currentSelectedEl)
   }
 
-  setSelectionType = (selectionType: SelectType) => {
+  setSelectionType = (selectionType: SelectionType) => {
     if (!this.selectionContainer) {
       return
     }
 
     let selectionElement: HTMLElement
 
-    if (selectionType === SelectType.ARTICLE) {
+    if (selectionType === SelectionType.ARTICLE) {
       selectionElement = getArticleSelectionEl()
-    } else if (selectionType === SelectType.FULL_PAGE) {
+    } else if (selectionType === SelectionType.FULL_PAGE) {
       selectionElement = document.body
     } else {
       return
@@ -155,5 +141,18 @@ export class SelectionManager {
 
   getCurrentSelectedTracingElement = () => {
     return this.selectedElementsMap.get(this.currentSelectedElementKey)
+  }
+
+  cleanup = () => {
+    document
+      .getElementById(ContainerPlusButtonId)
+      ?.removeEventListener("click", this.handlePlusButtonClick)
+    document
+      .getElementById(ContainerMinusButtonId)
+      ?.removeEventListener("click", this.handleMinusButtonClick)
+
+    if (this.selectionContainer && this.selectionContainer?.children.length) {
+      removeSelectionContainer()
+    }
   }
 }
