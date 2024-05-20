@@ -25,11 +25,6 @@ export enum WrapperTypes {
   TRACING = "tracing"
 }
 
-export enum MultiSelectionTypes {
-  ALL = "ALL",
-  PARAGRAPH = "PARAGRAPH"
-}
-
 export type StyleDeclaration = {
   [key: string]: string
 }

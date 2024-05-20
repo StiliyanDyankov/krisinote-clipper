@@ -4,14 +4,11 @@ import { colorsTailwind } from "../App"
 import CodeRoundedIcon from "@mui/icons-material/CodeRounded"
 import NotesOutlinedIcon from "@mui/icons-material/NotesOutlined"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import { MultiSelectionTypes, SelectionType } from "../lib/constants"
+import { SelectionType } from "../lib/constants"
 import { parseDomTree } from "../lib/parsing"
 import { SelectionManager } from "../lib/SelectionManager"
 
 const MultiselectPage = () => {
-  const [multiSelectionTypePseudo, setMultiSelectionTypePseudo] =
-    useState<MultiSelectionTypes>(MultiSelectionTypes.ALL)
-
   // stores outlined elements in state
   const [selectedElements, setSelectedElements] = useState<
     Map<number, HTMLElement>
@@ -127,12 +124,12 @@ const MultiselectPage = () => {
           startIcon={<CodeRoundedIcon />}
           sx={{
             backgroundColor:
-              multiSelectionTypePseudo === MultiSelectionTypes.ALL
+              selectionType === SelectionType.MULTISELECT_ALL
                 ? "rgba(255,255,255,0.1)"
                 : "initial"
           }}
           endIcon={
-            multiSelectionTypePseudo === MultiSelectionTypes.ALL ? (
+            selectionType === SelectionType.MULTISELECT_ALL ? (
               <CheckRoundedIcon />
             ) : null
           }
@@ -155,13 +152,13 @@ const MultiselectPage = () => {
           }}
           sx={{
             backgroundColor:
-              multiSelectionTypePseudo === MultiSelectionTypes.PARAGRAPH
+              selectionType === SelectionType.MULTISELECT_PARAGRAPH
                 ? "rgba(255,255,255,0.1)"
                 : "initial"
           }}
           startIcon={<NotesOutlinedIcon />}
           endIcon={
-            multiSelectionTypePseudo === MultiSelectionTypes.PARAGRAPH ? (
+            selectionType === SelectionType.MULTISELECT_PARAGRAPH ? (
               <CheckRoundedIcon />
             ) : null
           }
