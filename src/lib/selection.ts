@@ -212,10 +212,10 @@ export const createNewTracingElementWrapper = (
   }
 ) => {
   // get current wrapper
-  const currentSelectedElementWrapper =
+  const currentTracingElementWrapper =
     selectionContainer?.firstElementChild as HTMLElement
 
-  if (currentSelectedElementWrapper) {
+  if (currentTracingElementWrapper) {
     document
       .getElementById(ContainerPlusButtonId)
       ?.removeEventListener("click", eventHandlers.handlePlusButtonClick)
@@ -224,7 +224,7 @@ export const createNewTracingElementWrapper = (
       ?.removeEventListener("click", eventHandlers.handleMinusButtonClick)
     document
       .getElementById(SelectionContainerId)
-      ?.removeChild(currentSelectedElementWrapper)
+      ?.removeChild(currentTracingElementWrapper)
   }
 
   createNewElementWrapper(

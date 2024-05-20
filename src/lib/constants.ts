@@ -20,7 +20,8 @@ export const UnviableElements = [
 
 export enum WrapperTypes {
   hover = "hover",
-  selection = "selection"
+  selection = "selection",
+  tracing = "tracing"
 }
 
 export enum MultiSelectionTypes {
