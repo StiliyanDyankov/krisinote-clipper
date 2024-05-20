@@ -2,6 +2,7 @@ export const SelectionContainerId = "krisinote-clipper-selection-container"
 export const ContainerPlusButtonId = "krisinote-clipper-article-plus-button"
 export const ContainerMinusButtonId = "krisinote-clipper-article-minus-button"
 export const SelectionWrapperId = "krisinote-clipper-selection-wrapper"
+export const TracingWrapperId = "krisinote-clipper-tracing-wrapper"
 
 export const UnviableElements = [
   "SPAN",
@@ -19,9 +20,9 @@ export const UnviableElements = [
 ]
 
 export enum WrapperTypes {
-  hover = "hover",
-  selection = "selection",
-  tracing = "tracing"
+  HOVER = "hover",
+  SELECTION = "selection",
+  TRACING = "tracing"
 }
 
 export enum MultiSelectionTypes {
