@@ -4,28 +4,11 @@ import { colorsTailwind } from "../App"
 import CodeRoundedIcon from "@mui/icons-material/CodeRounded"
 import NotesOutlinedIcon from "@mui/icons-material/NotesOutlined"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import {
-  MultiSelectionTypes,
-  SelectionContainerId,
-  SelectionType
-} from "../lib/constants"
+import { MultiSelectionTypes, SelectionType } from "../lib/constants"
 import { parseDomTree } from "../lib/parsing"
-import { createSelectionContainer } from "../lib/selection"
 import { SelectionManager } from "../lib/SelectionManager"
 
 const MultiselectPage = () => {
-  const [selectionContainer, setSelectionContainer] =
-    useState<HTMLElement | null>(() => {
-      if (document.getElementById(SelectionContainerId)) {
-        document.body.removeChild(
-          document.getElementById(SelectionContainerId) as Node
-        )
-      }
-      return createSelectionContainer()
-    })
-
-  let multiSelectionType = useRef<MultiSelectionTypes>(MultiSelectionTypes.ALL)
-
   const [multiSelectionTypePseudo, setMultiSelectionTypePseudo] =
     useState<MultiSelectionTypes>(MultiSelectionTypes.ALL)
 
@@ -33,12 +16,6 @@ const MultiselectPage = () => {
   const [selectedElements, setSelectedElements] = useState<
     Map<number, HTMLElement>
   >(new Map())
-
-  const [selectedElementsDepth, setSelectedElementsDepth] = useState<
-    Map<number, number>
-  >(new Map())
-
-  let counterAutoIncr = useRef(1)
 
   const [selectionType, setSelectionType] = useState<SelectionType>(
     SelectionType.MULTISELECT_ALL
