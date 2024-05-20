@@ -12,7 +12,8 @@ import {
   MinusIconStyles,
   MinusLineStyles,
   TopElementStyles,
-  SelectionWrapperId
+  SelectionWrapperId,
+  TracingWrapperId
 } from "./constants"
 import { applyStyles } from "./lib"
 
@@ -160,12 +161,14 @@ export const getArticleSelectionEl = (): HTMLElement => {
   return docToBeReturned
 }
 
-export const putButtons = (id: number): void => {
-  const selectionWrapper = document.getElementById(
-    `${SelectionWrapperId}-${id}`
-  ) as HTMLElement
+export const putButtons = (): void => {
+  const tracingWrapper = getCurrentTracingWrapper()
 
-  selectionWrapper.style.position = "absolute"
+  if (!tracingWrapper) {
+    return
+  }
+
+  tracingWrapper.style.position = "absolute"
 
   const plusIcon = document.createElement("div")
   applyStyles(plusIcon, PlusIconStyles)
@@ -199,7 +202,7 @@ export const putButtons = (id: number): void => {
   topElement.appendChild(plusButton)
   topElement.appendChild(minusButton)
 
-  selectionWrapper.appendChild(topElement)
+  tracingWrapper.appendChild(topElement)
 }
 
 export const createNewTracingElementWrapper = (
@@ -212,8 +215,7 @@ export const createNewTracingElementWrapper = (
   }
 ) => {
   // get current wrapper
-  const currentTracingElementWrapper =
-    selectionContainer?.firstElementChild as HTMLElement
+  const currentTracingElementWrapper = getCurrentTracingWrapper()
 
   if (currentTracingElementWrapper) {
     document
@@ -222,24 +224,49 @@ export const createNewTracingElementWrapper = (
     document
       .getElementById(ContainerMinusButtonId)
       ?.removeEventListener("click", eventHandlers.handleMinusButtonClick)
-    document
-      .getElementById(SelectionContainerId)
-      ?.removeChild(currentTracingElementWrapper)
+
+    deleteCurrentTracingWrapper()
   }
 
   createNewElementWrapper(
     outlinedElement,
     selectionContainer as HTMLElement,
-    WrapperTypes.selection,
-    id
+    WrapperTypes.TRACING
   )
-  putButtons(id)
+
+  putButtons()
+
   document
     .getElementById(ContainerPlusButtonId)
     ?.addEventListener("click", eventHandlers.handlePlusButtonClick)
   document
     .getElementById(ContainerMinusButtonId)
     ?.addEventListener("click", eventHandlers.handleMinusButtonClick)
+}
+
+export const getCurrentTracingWrapper = (): HTMLElement | undefined => {
+  const selectionContainer = getSelectionContainer()
+
+  if (!selectionContainer) {
+    return
+  }
+
+  const tracingWrapper = selectionContainer.querySelector(
+    `[id^=${TracingWrapperId}`
+  )
+
+  return tracingWrapper instanceof HTMLElement ? tracingWrapper : undefined
+}
+
+export const deleteCurrentTracingWrapper = (): void => {
+  const selectionContainer = getSelectionContainer()
+  const tracingWrapper = getCurrentTracingWrapper()
+
+  if (!selectionContainer || !tracingWrapper) {
+    return
+  }
+
+  selectionContainer.removeChild(tracingWrapper)
 }
 
 export const getParentTracingElement = (

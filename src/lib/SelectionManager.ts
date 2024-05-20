@@ -11,6 +11,7 @@ import {
   createNewElementWrapper,
   createNewTracingElementWrapper,
   createSelectionContainer,
+  deleteCurrentTracingWrapper,
   findAndAnnihilateChildren,
   getArticleSelectionEl,
   getChildTracingElement,
@@ -191,6 +192,8 @@ export class SelectionManager {
       document
         .getElementById(ContainerMinusButtonId)
         ?.removeEventListener("click", this.handleMinusButtonClick)
+
+      deleteCurrentTracingWrapper()
     }
 
     this.hasAttachedTracingListeners = false
@@ -220,7 +223,7 @@ export class SelectionManager {
       createNewElementWrapper(
         outlinedElement,
         this.selectionContainer,
-        WrapperTypes.hover
+        WrapperTypes.HOVER
       )
     }
   }
@@ -277,7 +280,7 @@ export class SelectionManager {
       createNewElementWrapper(
         outlinedElement,
         this.selectionContainer,
-        WrapperTypes.selection,
+        WrapperTypes.SELECTION,
         this.msCounter
       )
 
