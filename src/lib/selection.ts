@@ -208,7 +208,6 @@ export const putButtons = (): void => {
 export const createNewTracingElementWrapper = (
   outlinedElement: HTMLElement,
   selectionContainer: HTMLElement,
-  id: number,
   eventHandlers: {
     handlePlusButtonClick: () => void
     handleMinusButtonClick: () => void

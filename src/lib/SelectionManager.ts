@@ -105,15 +105,10 @@ export class SelectionManager {
       nextElement
     )
 
-    createNewTracingElementWrapper(
-      nextElement,
-      this.selectionContainer,
-      this.currentTracingSelectedElementKey,
-      {
-        handlePlusButtonClick: this.handlePlusButtonClick,
-        handleMinusButtonClick: this.handleMinusButtonClick
-      }
-    )
+    createNewTracingElementWrapper(nextElement, this.selectionContainer, {
+      handlePlusButtonClick: this.handlePlusButtonClick,
+      handleMinusButtonClick: this.handleMinusButtonClick
+    })
   }
 
   getNextTracingElement = (direction: TracingDirection) => {
@@ -173,15 +168,10 @@ export class SelectionManager {
       selectionElement
     )
 
-    createNewTracingElementWrapper(
-      selectionElement,
-      this.selectionContainer,
-      this.currentTracingSelectedElementKey,
-      {
-        handlePlusButtonClick: this.handlePlusButtonClick,
-        handleMinusButtonClick: this.handleMinusButtonClick
-      }
-    )
+    createNewTracingElementWrapper(selectionElement, this.selectionContainer, {
+      handlePlusButtonClick: this.handlePlusButtonClick,
+      handleMinusButtonClick: this.handleMinusButtonClick
+    })
   }
 
   cleanupTracingTypeMode = () => {
