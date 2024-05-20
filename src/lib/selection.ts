@@ -38,10 +38,10 @@ export const isElementViable = (element: Element): HTMLElement | undefined => {
   }
 }
 
-export const getViableParent = (element: HTMLElement): HTMLElement => {
+export const getViableElementOrParent = (element: HTMLElement): HTMLElement => {
   if (isElementViable(element)) {
     return element
-  } else return getViableParent(element.parentElement as HTMLElement)
+  } else return getViableElementOrParent(element.parentElement as HTMLElement)
 }
 
 export const createSelectionContainer = (): HTMLElement => {

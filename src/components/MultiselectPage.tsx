@@ -49,6 +49,10 @@ const MultiselectPage = () => {
 
   let counterAutoIncr = useRef(1)
 
+  const [selectionType, setSelectionType] = useState<SelectionType>(
+    SelectionType.MULTISELECT_ALL
+  )
+
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   const handleMouseOverEvent = (event: MouseEvent): void => {
@@ -158,18 +162,14 @@ const MultiselectPage = () => {
 
   // that's the working version - version 2 of event handlers is the initial one
   useEffect(() => {
-    document.addEventListener("mouseover", handleMouseOverEvent)
-    document.addEventListener("mouseout", handleMouseOutEvent)
-    document.addEventListener("click", handleClickEvent)
+    selectionManagerInstance.current = new SelectionManager()
 
     return () => {
-      // clean-up
-      document.removeEventListener("mouseover", handleMouseOverEvent)
-      document.removeEventListener("mouseout", handleMouseOutEvent)
-      document.removeEventListener("click", handleClickEvent)
-      if (selectionContainer) {
-        removeSelectionContainer()
+      if (selectionManagerInstance.current) {
+        selectionManagerInstance.current.cleanup()
       }
+
+      selectionManagerInstance.current = undefined
     }
   }, [])
 
@@ -179,6 +179,12 @@ const MultiselectPage = () => {
       setIsLoading(false)
     }
   }, [isLoading])
+
+  useEffect(() => {
+    if (selectionManagerInstance.current) {
+      selectionManagerInstance.current.setSelectionType(selectionType)
+    }
+  }, [selectionType])
 
   return (
     <>
@@ -240,8 +246,7 @@ const MultiselectPage = () => {
         <Button
           color="secondary"
           onClick={() => {
-            multiSelectionType.current = MultiSelectionTypes.ALL
-            setMultiSelectionTypePseudo(MultiSelectionTypes.ALL)
+            onSelectionPress(SelectionType.MULTISELECT_ALL)
           }}
           style={{
             justifyContent: "flex-start",
@@ -270,8 +275,7 @@ const MultiselectPage = () => {
         <Button
           color="secondary"
           onClick={() => {
-            multiSelectionType.current = MultiSelectionTypes.PARAGRAPH
-            setMultiSelectionTypePseudo(MultiSelectionTypes.PARAGRAPH)
+            onSelectionPress(SelectionType.MULTISELECT_PARAGRAPH)
           }}
           style={{
             justifyContent: "flex-start",

@@ -19,6 +19,16 @@ export class SelectionManager {
   public selectedElementsMap: Map<number, HTMLElement> = new Map()
   private selectionContainer: HTMLElement | null = null
   private selectionType: SelectionType = SelectionType.ARTICLE
+  private selectionContainer: HTMLElement | null = null
+
+  private hasAttachedTracingListeners = false
+  public currentTracingSelectedElementKey = 9999
+  public tracingElementsMap: Map<number, HTMLElement> = new Map()
+
+  private hasAttachedMultiselectListeners = false
+  private msCounter = 1
+  private msSelectedElements: Map<number, HTMLElement> = new Map()
+  private msElementsDepth: Map<number, number> = new Map()
 
   constructor() {
     this.selectionContainer = this.handleInitialSelectionContainerCreation()

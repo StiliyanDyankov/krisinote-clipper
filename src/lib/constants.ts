@@ -138,7 +138,9 @@ export const RootElementStyles: StyleDeclaration = {
 
 export enum SelectionType {
   ARTICLE = "ARTICLE",
-  FULL_PAGE = "FULL_PAGE"
+  FULL_PAGE = "FULL_PAGE",
+  MULTISELECT_ALL = "MULTISELECT_ALL",
+  MULTISELECT_PARAGRAPH = "MULTISELECT_PARAGRAPH"
 }
 
 export type TracingDirection = "up" | "down"

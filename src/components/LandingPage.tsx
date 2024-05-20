@@ -30,8 +30,8 @@ const LandingPage = ({
       return
     }
 
-    const selectedElement = manager.selectedElementsMap.get(
-      manager.currentSelectedElementKey
+    const selectedElement = manager.tracingElementsMap.get(
+      manager.currentTracingSelectedElementKey
     )
 
     if (!selectedElement) {
