@@ -7,19 +7,10 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import {
   MultiSelectionTypes,
   SelectionContainerId,
-  SelectionWrapperId,
-  WrapperTypes
+  SelectionType
 } from "../lib/constants"
 import { parseDomTree } from "../lib/parsing"
-import {
-  createSelectionContainer,
-  createNewElementWrapper,
-  removeHoverWrapper,
-  findAndAnnihilateChildren,
-  getElementDepth,
-  getViableParent,
-  removeSelectionContainer
-} from "../lib/selection"
+import { createSelectionContainer } from "../lib/selection"
 import { SelectionManager } from "../lib/SelectionManager"
 
 const MultiselectPage = () => {
@@ -55,112 +46,14 @@ const MultiselectPage = () => {
 
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
-  const handleMouseOverEvent = (event: MouseEvent): void => {
-    let hoveredElement = event.target as HTMLElement
-    if (
-      !hoveredElement.id.startsWith(SelectionWrapperId) &&
-      // last two checks for ignoring pop-up selection
-      !hoveredElement.id.startsWith("react-chrome-app") &&
-      !(hoveredElement.nodeName === "IFRAME")
-    ) {
-      let outlinedElement: HTMLElement | null =
-        getViableOutlinedElement(hoveredElement)
-      if (!outlinedElement) return
+  const selectionManagerInstance = useRef<SelectionManager | undefined>(
+    undefined
+  )
 
-      createNewElementWrapper(
-        outlinedElement,
-        selectionContainer as HTMLElement,
-        WrapperTypes.hover
-      )
-    }
+  const onSelectionPress = (selectionType: SelectionType) => {
+    setSelectionType(selectionType)
   }
 
-  const handleMouseOutEvent = (event: MouseEvent): void => {
-    removeHoverWrapper(selectionContainer as HTMLElement)
-  }
-
-  const handleClickEvent = (event: MouseEvent): void => {
-    event.preventDefault()
-    let outlinedElement: HTMLElement | null = getViableOutlinedElement(
-      event.target as HTMLElement
-    )
-
-    if (!outlinedElement) return
-
-    if (
-      outlinedElement.id.startsWith("react-chrome-app") &&
-      outlinedElement.nodeName === "IFRAME"
-    ) {
-      //
-      // empty - no behaviour if selected element is the clipper itself
-      //
-    } else if (outlinedElement.id.startsWith(SelectionWrapperId)) {
-      // executes on second time selection of an element - removes the selected el
-
-      const keyOfSavedElement = parseInt(outlinedElement.id.split("-")[4])
-      selectedElements.delete(keyOfSavedElement)
-      selectedElementsDepth.delete(keyOfSavedElement)
-      setSelectedElements(selectedElements)
-      setSelectedElementsDepth(selectedElementsDepth)
-      document
-        .getElementById(SelectionContainerId)
-        ?.removeChild(outlinedElement)
-    } else {
-      // executed on initial selection of an element
-      findAndAnnihilateChildren(selectedElements, selectedElementsDepth, {
-        element: outlinedElement,
-        depth: getElementDepth(outlinedElement)
-      })
-
-      // this logic should remain the same whether selected is parent or not
-      setSelectedElements(
-        new Map(selectedElements.set(counterAutoIncr.current, outlinedElement))
-      )
-      setSelectedElementsDepth(
-        new Map(
-          selectedElementsDepth.set(
-            counterAutoIncr.current,
-            getElementDepth(outlinedElement)
-          )
-        )
-      )
-      createNewElementWrapper(
-        outlinedElement,
-        selectionContainer as HTMLElement,
-        WrapperTypes.selection,
-        counterAutoIncr.current
-      )
-
-      counterAutoIncr.current = counterAutoIncr.current + 1
-    }
-  }
-
-  const getViableOutlinedElement = (
-    hoveredElement: HTMLElement
-  ): HTMLElement | null => {
-    let isOutside = true
-    document
-      .querySelectorAll("#react-chrome-app * , #react-chrome-app")
-      .forEach((node) => {
-        if (node === hoveredElement) {
-          isOutside = false
-          return
-        }
-      })
-    const outlinedElement = getViableParent(hoveredElement)
-    if (!isOutside) {
-      return null
-    } else if (multiSelectionType.current === MultiSelectionTypes.ALL) {
-      return outlinedElement
-    } else if (multiSelectionType.current === MultiSelectionTypes.PARAGRAPH) {
-      return outlinedElement.nodeName === "P" ||
-        outlinedElement.id.startsWith(SelectionWrapperId)
-        ? outlinedElement
-        : null
-    } else return null
-  }
-
-  // that's the working version - version 2 of event handlers is the initial one
   useEffect(() => {
     selectionManagerInstance.current = new SelectionManager()
 
