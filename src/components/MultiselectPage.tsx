@@ -5,14 +5,10 @@ import CodeRoundedIcon from "@mui/icons-material/CodeRounded"
 import NotesOutlinedIcon from "@mui/icons-material/NotesOutlined"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { SelectionType } from "../lib/constants"
-import { parseDomTree } from "../lib/parsing"
 import { SelectionManager } from "../lib/SelectionManager"
 
 const MultiselectPage = () => {
-  // stores outlined elements in state
-  const [selectedElements, setSelectedElements] = useState<
-    Map<number, HTMLElement>
-  >(new Map())
+  const [numberOfSelectedElements, setNumberOfSelectedElements] = useState(0)
 
   const [selectionType, setSelectionType] = useState<SelectionType>(
     SelectionType.MULTISELECT_ALL
@@ -30,6 +26,9 @@ const MultiselectPage = () => {
 
   useEffect(() => {
     selectionManagerInstance.current = new SelectionManager()
+    selectionManagerInstance.current.setMsPressCb((numberOfElements) => {
+      setNumberOfSelectedElements(numberOfElements)
+    })
 
     return () => {
       if (selectionManagerInstance.current) {
@@ -42,7 +41,6 @@ const MultiselectPage = () => {
 
   useEffect(() => {
     if (isLoading) {
-      parseDomTree(selectedElements, true)
       setIsLoading(false)
     }
   }, [isLoading])
@@ -66,7 +64,7 @@ const MultiselectPage = () => {
         <Button
           color="primary"
           variant="contained"
-          disabled={!(selectedElements.size >= 1) || isLoading}
+          disabled={!(numberOfSelectedElements >= 1) || isLoading}
           onClick={() => {
             setIsLoading(true)
           }}
@@ -85,10 +83,10 @@ const MultiselectPage = () => {
             ) : null
           }
         >
-          Save {selectedElements.size}{" "}
-          {selectedElements.size > 1
+          Save {numberOfSelectedElements}{" "}
+          {numberOfSelectedElements > 1
             ? "Selections"
-            : selectedElements.size === 1
+            : numberOfSelectedElements === 1
               ? "Selection"
               : ""}
         </Button>

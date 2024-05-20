@@ -36,6 +36,8 @@ export class SelectionManager {
   private msCounter = 1
   private msSelectedElements: Map<number, HTMLElement> = new Map()
   private msElementsDepth: Map<number, number> = new Map()
+  private msPressCb: ((numberOfElements: number) => void) | undefined =
+    undefined
 
   constructor() {
     this.selectionContainer = this.handleInitialSelectionContainerCreation()
@@ -193,6 +195,10 @@ export class SelectionManager {
 
   // -------------- multi selection start -------------
 
+  setMsPressCb = (cb: (numberOfElements: number) => void) => {
+    this.msPressCb = cb
+  }
+
   handleMouseOverEvent = (event: MouseEvent): void => {
     if (!this.selectionContainer) {
       return
@@ -276,6 +282,8 @@ export class SelectionManager {
 
       this.msCounter++
     }
+
+    this.msPressCb?.(this.msSelectedElements.size)
   }
 
   getViableOutlinedElement = (
