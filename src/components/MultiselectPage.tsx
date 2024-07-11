@@ -26,9 +26,11 @@ const MultiselectPage = () => {
 
   useEffect(() => {
     selectionManagerInstance.current = new SelectionManager()
-    selectionManagerInstance.current.setMsPressCb((numberOfElements) => {
-      setNumberOfSelectedElements(numberOfElements)
-    })
+    selectionManagerInstance.current.setMultiSelectPressCallback(
+      (numberOfElements) => {
+        setNumberOfSelectedElements(numberOfElements)
+      }
+    )
 
     return () => {
       if (selectionManagerInstance.current) {

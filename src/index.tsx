@@ -2,7 +2,7 @@ import React from "react"
 import ReactDOM from "react-dom/client"
 import App from "./App"
 import { applyStyles } from "./lib/lib"
-import { RootElementStyles } from "./lib/constants"
+import { ClipperRootElementId, RootElementStyles } from "./lib/constants"
 
 export let root: any = null
 const rootElement = document.createElement("div")
@@ -10,7 +10,7 @@ applyStyles(rootElement, RootElementStyles)
 // rootElement.style.backgroundColor = "#ffffff";
 // rootElement.style.pointerEvents = "none";
 
-rootElement.id = "react-chrome-app"
+rootElement.id = ClipperRootElementId
 
 document.body.appendChild(rootElement)
 

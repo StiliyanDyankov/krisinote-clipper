@@ -13,7 +13,8 @@ import {
   MinusLineStyles,
   TopElementStyles,
   SelectionWrapperId,
-  TracingWrapperId
+  TracingWrapperId,
+  ClipperRootElementId
 } from "./constants"
 import { applyStyles } from "./lib"
 
@@ -28,12 +29,15 @@ export const removeWrappers = (): void => {
   }
 }
 
-export const isElementViable = (element: Element): HTMLElement | undefined => {
+export const isElementViable = (
+  element: Element | EventTarget
+): HTMLElement | undefined => {
   if (
     element instanceof HTMLElement &&
     window.getComputedStyle(element).getPropertyValue("display") !== "inline" &&
     !UnviableElements.includes(element.nodeName) &&
-    element.id !== SelectionContainerId
+    element.id !== SelectionContainerId &&
+    !isElementClipper(element)
   ) {
     return element
   }
@@ -290,4 +294,8 @@ export const getChildTracingElement = (
 
 export const getSelectionContainer = (): HTMLElement | null => {
   return document.getElementById(SelectionContainerId)
+}
+
+export const isElementClipper = (element: HTMLElement): boolean => {
+  return element.id.startsWith(ClipperRootElementId)
 }

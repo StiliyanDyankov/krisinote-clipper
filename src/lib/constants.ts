@@ -1,3 +1,4 @@
+export const ClipperRootElementId = "react-chrome-app"
 export const SelectionContainerId = "krisinote-clipper-selection-container"
 export const ContainerPlusButtonId = "krisinote-clipper-article-plus-button"
 export const ContainerMinusButtonId = "krisinote-clipper-article-minus-button"
@@ -28,14 +29,6 @@ export enum WrapperTypes {
 export type StyleDeclaration = {
   [key: string]: string
 }
-
-// TODO: make this work in some bright future
-// export type StyleDeclaration2 = Partial<
-//   Record<
-//     keyof Exclude<keyof CSSStyleDeclaration, number | typeof Symbol.iterator>,
-//     string
-//   >
-// >;
 
 export const PlusIconStyles: StyleDeclaration = {
   width: "20px",
