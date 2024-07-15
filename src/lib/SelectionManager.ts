@@ -1,7 +1,7 @@
 import {
-  ClipperRootElementId,
   ContainerMinusButtonId,
   ContainerPlusButtonId,
+  HoverWrapperId,
   SelectionContainerId,
   SelectionType,
   SelectionWrapperId,
@@ -20,9 +20,10 @@ import {
   getParentTracingElement,
   getSelectionContainer,
   getViableElementOrParent,
-  isElementViable,
+  validateSelectionElement,
   removeHoverWrapper,
-  removeSelectionContainer
+  removeSelectionContainer,
+  isElementInClipper
 } from "./selection"
 import { assertNever } from "./utils"
 
@@ -32,7 +33,7 @@ export class SelectionManager {
 
   private hasAttachedTracingListeners = false
   public currentTracingSelectedElementKey = 9999
-  public tracingElementsMap: Map<number, HTMLElement> = new Map()
+  public tracingElements: Map<number, HTMLElement> = new Map()
 
   private hasAttachedMultiselectListeners = false
   private multiSelectCounter = 1
@@ -104,10 +105,7 @@ export class SelectionManager {
 
     this.currentTracingSelectedElementKey += tracingDelta
 
-    this.tracingElementsMap.set(
-      this.currentTracingSelectedElementKey,
-      nextElement
-    )
+    this.tracingElements.set(this.currentTracingSelectedElementKey, nextElement)
 
     createNewTracingElementWrapper(nextElement, this.selectionContainer, {
       handlePlusButtonClick: this.handlePlusButtonClick,
@@ -118,7 +116,7 @@ export class SelectionManager {
   getNextTracingElement = (direction: TracingDirection) => {
     const depthDelta = direction === "up" ? 1 : -1
 
-    const nextCachedElement = this.tracingElementsMap.get(
+    const nextCachedElement = this.tracingElements.get(
       this.currentTracingSelectedElementKey + depthDelta
     )
 
@@ -138,7 +136,7 @@ export class SelectionManager {
   }
 
   getCurrentSelectedTracingElement = () => {
-    return this.tracingElementsMap.get(this.currentTracingSelectedElementKey)
+    return this.tracingElements.get(this.currentTracingSelectedElementKey)
   }
 
   initTracingTypeMode = (selectionType: SelectionType) => {
@@ -167,7 +165,7 @@ export class SelectionManager {
       return
     }
 
-    this.tracingElementsMap.set(
+    this.tracingElements.set(
       this.currentTracingSelectedElementKey,
       selectionElement
     )
@@ -201,31 +199,31 @@ export class SelectionManager {
     this.multiSelectPressCb = cb
   }
 
-  handleMultiSelectMouseOverEvent = (event: MouseEvent): void => {
+  handleMultiSelectMouseOver = (event: MouseEvent): void => {
     if (!this.selectionContainer || !event.target) {
       return
     }
 
-    const hoveredElement = isElementViable(event.target)
+    const hoveredElement = validateSelectionElement(event.target)
 
-    if (!hoveredElement) {
+    if (!hoveredElement || hoveredElement.id.startsWith(HoverWrapperId)) {
       return
     }
 
-    const outlinedElement = this.getViableOutlinedElement(hoveredElement)
+    const viableHoveredElement = this.getViableHoveredElement(hoveredElement)
 
-    if (!outlinedElement) {
+    if (!viableHoveredElement) {
       return
     }
 
     createNewElementWrapper(
-      outlinedElement,
+      viableHoveredElement,
       this.selectionContainer,
       WrapperTypes.HOVER
     )
   }
 
-  handleMultiSelectMouseOutEvent = (): void => {
+  handleMultiSelectMouseOut = (): void => {
     if (!this.selectionContainer) {
       return
     }
@@ -242,46 +240,43 @@ export class SelectionManager {
       return
     }
 
-    const outlinedElement = this.getViableOutlinedElement(targetElement)
+    const viableHoveredElement = this.getViableHoveredElement(targetElement)
 
-    if (!outlinedElement) {
+    if (!viableHoveredElement) {
       return
     }
 
-    if (
-      outlinedElement.id.startsWith(ClipperRootElementId) &&
-      outlinedElement.nodeName === "IFRAME"
-    ) {
-      //
-      // empty - no behaviour if selected element is the clipper itself
-      //
-    } else if (outlinedElement.id.startsWith(SelectionWrapperId)) {
+    if (viableHoveredElement.id.startsWith(SelectionWrapperId)) {
       // executes on second time selection of an element - removes the selected el
 
-      const keyOfSavedElement = parseInt(outlinedElement.id.split("-")[4])
+      const keyOfSavedElement = parseInt(viableHoveredElement.id.split("-")[4])
       this.multiSelectSelectedElements.delete(keyOfSavedElement)
       this.multiSelectElementsDepth.delete(keyOfSavedElement)
-      document
-        .getElementById(SelectionContainerId)
-        ?.removeChild(outlinedElement)
+      this.selectionContainer?.removeChild(viableHoveredElement)
     } else {
+      const hoverWrapper = document.getElementById(HoverWrapperId)
+
+      if (hoverWrapper) {
+        this.selectionContainer?.removeChild(hoverWrapper)
+      }
+
       // executed on initial selection of an element
       findAndAnnihilateChildren(
         this.multiSelectSelectedElements,
         this.multiSelectElementsDepth,
         {
-          element: outlinedElement,
-          depth: getElementDepth(outlinedElement)
+          element: viableHoveredElement,
+          depth: getElementDepth(viableHoveredElement)
         }
       )
 
       this.multiSelectSelectedElements.set(
         this.multiSelectCounter,
-        outlinedElement
+        viableHoveredElement
       )
       this.multiSelectElementsDepth.set(
         this.multiSelectCounter,
-        getElementDepth(outlinedElement)
+        getElementDepth(viableHoveredElement)
       )
 
       if (!this.selectionContainer) {
@@ -289,7 +284,7 @@ export class SelectionManager {
       }
 
       createNewElementWrapper(
-        outlinedElement,
+        viableHoveredElement,
         this.selectionContainer,
         WrapperTypes.SELECTION,
         this.multiSelectCounter
@@ -301,41 +296,44 @@ export class SelectionManager {
     this.multiSelectPressCb?.(this.multiSelectSelectedElements.size)
   }
 
-  getViableOutlinedElement = (
+  getViableHoveredElement = (
     hoveredElement: HTMLElement
-  ): HTMLElement | null => {
-    let isOutside = true
+  ): HTMLElement | undefined => {
+    if (isElementInClipper(hoveredElement)) {
+      return
+    }
 
-    document
-      .querySelectorAll(`#${ClipperRootElementId} * , #${ClipperRootElementId}`)
-      .forEach((node) => {
-        if (node === hoveredElement) {
-          isOutside = false
-          return
-        }
-      })
+    let isElementSelected = false
+
+    this.multiSelectSelectedElements.forEach((element) => {
+      if (element === hoveredElement) {
+        isElementSelected = true
+        return
+      }
+    })
+
+    if (isElementSelected) {
+      return
+    }
 
     const outlinedElement = getViableElementOrParent(hoveredElement)
 
-    if (!isOutside) {
-      return null
-    } else if (this.selectionType === SelectionType.MULTISELECT_ALL) {
+    if (this.selectionType === SelectionType.MULTISELECT_ALL) {
       return outlinedElement
     } else if (this.selectionType === SelectionType.MULTISELECT_PARAGRAPH) {
       return outlinedElement.nodeName === "P" ||
         outlinedElement.id.startsWith(SelectionWrapperId)
         ? outlinedElement
-        : null
-    } else return null
+        : undefined
+    } else {
+      return
+    }
   }
 
   initMultiSelectTypeMode = () => {
     if (!this.hasAttachedMultiselectListeners) {
-      document.addEventListener(
-        "mouseover",
-        this.handleMultiSelectMouseOverEvent
-      )
-      document.addEventListener("mouseout", this.handleMultiSelectMouseOutEvent)
+      document.addEventListener("mouseover", this.handleMultiSelectMouseOver)
+      document.addEventListener("mouseout", this.handleMultiSelectMouseOut)
       document.addEventListener("click", this.handleMultiSelectElementPress)
     }
 
@@ -344,14 +342,8 @@ export class SelectionManager {
 
   cleanupMultiSelectTypeMode = () => {
     if (this.hasAttachedMultiselectListeners) {
-      document.removeEventListener(
-        "mouseover",
-        this.handleMultiSelectMouseOverEvent
-      )
-      document.removeEventListener(
-        "mouseout",
-        this.handleMultiSelectMouseOutEvent
-      )
+      document.removeEventListener("mouseover", this.handleMultiSelectMouseOver)
+      document.removeEventListener("mouseout", this.handleMultiSelectMouseOut)
       document.removeEventListener("click", this.handleMultiSelectElementPress)
     }
 

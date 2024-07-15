@@ -30,7 +30,7 @@ const LandingPage = ({
       return
     }
 
-    const selectedElement = manager.tracingElementsMap.get(
+    const selectedElement = manager.tracingElements.get(
       manager.currentTracingSelectedElementKey
     )
 

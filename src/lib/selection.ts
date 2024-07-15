@@ -14,7 +14,8 @@ import {
   TopElementStyles,
   SelectionWrapperId,
   TracingWrapperId,
-  ClipperRootElementId
+  ClipperRootElementId,
+  HoverWrapperId
 } from "./constants"
 import { applyStyles } from "./lib"
 
@@ -29,7 +30,7 @@ export const removeWrappers = (): void => {
   }
 }
 
-export const isElementViable = (
+export const validateSelectionElement = (
   element: Element | EventTarget
 ): HTMLElement | undefined => {
   if (
@@ -37,14 +38,15 @@ export const isElementViable = (
     window.getComputedStyle(element).getPropertyValue("display") !== "inline" &&
     !UnviableElements.includes(element.nodeName) &&
     element.id !== SelectionContainerId &&
-    !isElementClipper(element)
+    !isElementClipper(element) &&
+    !isElementInClipper(element)
   ) {
     return element
   }
 }
 
 export const getViableElementOrParent = (element: HTMLElement): HTMLElement => {
-  if (isElementViable(element)) {
+  if (validateSelectionElement(element)) {
     return element
   } else return getViableElementOrParent(element.parentElement as HTMLElement)
 }
@@ -69,32 +71,31 @@ export const createNewElementWrapper = (
   type: WrapperTypes,
   id: number | null = null
 ): HTMLElement => {
-  const hoverWrapper = document.createElement("div")
+  const wrapper = document.createElement("div")
 
-  hoverWrapper.id = `krisinote-clipper-${type}-wrapper${id ? "-" + id : ""}`
+  wrapper.id = `krisinote-clipper-${type}-wrapper${id ? "-" + id : ""}`
 
-  applyStyles(hoverWrapper, HoverWrapperStyles)
+  applyStyles(wrapper, HoverWrapperStyles)
 
   if (!id) {
-    hoverWrapper.style.pointerEvents = "none"
+    wrapper.style.pointerEvents = "none"
   } else {
-    hoverWrapper.style.pointerEvents = "all"
+    wrapper.style.pointerEvents = "all"
   }
 
-  hoverWrapper.style.height = window.getComputedStyle(outlinedElement).height
-  hoverWrapper.style.width = window.getComputedStyle(outlinedElement).width
-  hoverWrapper.style.top = `${outlinedElement.getBoundingClientRect().top + window.scrollY}px`
-  hoverWrapper.style.left = `${outlinedElement.getBoundingClientRect().left + window.scrollX}px`
+  wrapper.style.height = window.getComputedStyle(outlinedElement).height
+  wrapper.style.width = window.getComputedStyle(outlinedElement).width
+  wrapper.style.top = `${outlinedElement.getBoundingClientRect().top + window.scrollY}px`
+  wrapper.style.left = `${outlinedElement.getBoundingClientRect().left + window.scrollX}px`
 
-  selectionContainer.appendChild(hoverWrapper)
+  selectionContainer.appendChild(wrapper)
 
-  return hoverWrapper
+  return wrapper
 }
 
 export const removeHoverWrapper = (selectionContainer: HTMLElement): void => {
-  const hoverWrapper = document.getElementById(
-    "krisinote-clipper-hover-wrapper"
-  )
+  const hoverWrapper = document.getElementById(HoverWrapperId)
+
   if (hoverWrapper) {
     selectionContainer.removeChild(hoverWrapper as Node)
   }
@@ -288,7 +289,7 @@ export const getChildTracingElement = (
   const child = element.firstElementChild
 
   if (child) {
-    return isElementViable(child)
+    return validateSelectionElement(child)
   }
 }
 
@@ -298,4 +299,19 @@ export const getSelectionContainer = (): HTMLElement | null => {
 
 export const isElementClipper = (element: HTMLElement): boolean => {
   return element.id.startsWith(ClipperRootElementId)
+}
+
+export const isElementInClipper = (element: HTMLElement): boolean => {
+  let isInClipper = false
+
+  document
+    .querySelectorAll(`#${ClipperRootElementId} * , #${ClipperRootElementId}`)
+    .forEach((node) => {
+      if (node === element) {
+        isInClipper = true
+        return
+      }
+    })
+
+  return isInClipper
 }
