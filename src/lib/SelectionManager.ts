@@ -19,7 +19,7 @@ import {
   getElementDepth,
   getParentTracingElement,
   getSelectionContainer,
-  getViableElementOrParent,
+  getValidElementOrParent,
   validateSelectionElement,
   removeHoverWrapper,
   removeSelectionContainer,
@@ -39,7 +39,7 @@ export class SelectionManager {
   private multiSelectCounter = 1
   private multiSelectSelectedElements: Map<number, HTMLElement> = new Map()
   private multiSelectElementsDepth: Map<number, number> = new Map()
-  private multiSelectPressCb: ((numberOfElements: number) => void) | undefined =
+  private onMultiSelectElementPress: ((numberOfElements: number) => void) | undefined =
     undefined
 
   constructor() {
@@ -196,7 +196,7 @@ export class SelectionManager {
   // -------------- multi selection start -------------
 
   setMultiSelectPressCallback = (cb: (numberOfElements: number) => void) => {
-    this.multiSelectPressCb = cb
+    this.onMultiSelectElementPress = cb
   }
 
   handleMultiSelectMouseOver = (event: MouseEvent): void => {
@@ -293,7 +293,7 @@ export class SelectionManager {
       this.multiSelectCounter++
     }
 
-    this.multiSelectPressCb?.(this.multiSelectSelectedElements.size)
+    this.onMultiSelectElementPress?.(this.multiSelectSelectedElements.size)
   }
 
   getViableHoveredElement = (
@@ -316,7 +316,7 @@ export class SelectionManager {
       return
     }
 
-    const outlinedElement = getViableElementOrParent(hoveredElement)
+    const outlinedElement = getValidElementOrParent(hoveredElement)
 
     if (this.selectionType === SelectionType.MULTISELECT_ALL) {
       return outlinedElement

@@ -19,8 +19,6 @@ import {
 } from "./constants"
 import { applyStyles } from "./lib"
 
-export {}
-
 export const removeWrappers = (): void => {
   const selectionContainer = document.getElementById(SelectionContainerId)
   if (selectionContainer) {
@@ -45,10 +43,10 @@ export const validateSelectionElement = (
   }
 }
 
-export const getViableElementOrParent = (element: HTMLElement): HTMLElement => {
+export const getValidElementOrParent = (element: HTMLElement): HTMLElement => {
   if (validateSelectionElement(element)) {
     return element
-  } else return getViableElementOrParent(element.parentElement as HTMLElement)
+  } else return getValidElementOrParent(element.parentElement as HTMLElement)
 }
 
 export const createSelectionContainer = (): HTMLElement => {
@@ -115,7 +113,7 @@ export const findAndAnnihilateChildren = (
           value - possibleParent.depth
         )
       ) {
-        annihilateChild(key)
+        deleteSelectionWrapper(key)
         selectedElements.delete(key)
         selectedElementsDepth.delete(key)
       }
@@ -124,9 +122,9 @@ export const findAndAnnihilateChildren = (
   return selectedElements
 }
 
-export const annihilateChild = (keyOfChild: number): void => {
+export const deleteSelectionWrapper = (selectionWrapperId: number): void => {
   const childWrapper = document.getElementById(
-    `${SelectionWrapperId}-${keyOfChild}`
+    `${SelectionWrapperId}-${selectionWrapperId}`
   )
   const selectionContainer = document.getElementById(SelectionContainerId)
 
@@ -139,9 +137,11 @@ export const isNthParent = (
   deltaDepth: number
 ) => {
   let childPlaceholder = childElement
+
   for (let i = 0; i < deltaDepth; i++) {
     childPlaceholder = childPlaceholder.parentElement as HTMLElement
   }
+
   return childPlaceholder === possibleParent
 }
 
@@ -149,8 +149,9 @@ export const getElementDepth = (
   element: HTMLElement,
   counter: number = 0
 ): number => {
-  if (element.nodeName === "BODY") return counter
-  else return getElementDepth(element.parentElement as HTMLElement, counter + 1)
+  return element.nodeName === "BODY"
+    ? counter
+    : getElementDepth(element.parentElement as HTMLElement, counter + 1)
 }
 
 export const getArticleSelectionEl = (): HTMLElement => {
@@ -166,7 +167,10 @@ export const getArticleSelectionEl = (): HTMLElement => {
   return docToBeReturned
 }
 
-export const putButtons = (): void => {
+export const createTracingButtons = (eventHandlers: {
+  handlePlusButtonClick: () => void
+  handleMinusButtonClick: () => void
+}): void => {
   const tracingWrapper = getCurrentTracingWrapper()
 
   if (!tracingWrapper) {
@@ -208,6 +212,9 @@ export const putButtons = (): void => {
   topElement.appendChild(minusButton)
 
   tracingWrapper.appendChild(topElement)
+
+  plusButton.addEventListener("click", eventHandlers.handlePlusButtonClick)
+  minusButton.addEventListener("click", eventHandlers.handleMinusButtonClick)
 }
 
 export const createNewTracingElementWrapper = (
@@ -218,7 +225,6 @@ export const createNewTracingElementWrapper = (
     handleMinusButtonClick: () => void
   }
 ) => {
-  // get current wrapper
   const currentTracingElementWrapper = getCurrentTracingWrapper()
 
   if (currentTracingElementWrapper) {
@@ -238,14 +244,7 @@ export const createNewTracingElementWrapper = (
     WrapperTypes.TRACING
   )
 
-  putButtons()
-
-  document
-    .getElementById(ContainerPlusButtonId)
-    ?.addEventListener("click", eventHandlers.handlePlusButtonClick)
-  document
-    .getElementById(ContainerMinusButtonId)
-    ?.addEventListener("click", eventHandlers.handleMinusButtonClick)
+  createTracingButtons(eventHandlers)
 }
 
 export const getCurrentTracingWrapper = (): HTMLElement | undefined => {
